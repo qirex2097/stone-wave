@@ -12,6 +12,30 @@ int init_player(t_player *player)
     return 0;
 }
 
+int init_mouse(t_mouse *mouse)
+{
+    mouse->x = 0;
+    mouse->y = 0;
+    mouse->button = 0;
+
+    return 0;
+}
+
+int update_player(t_vars *vars)
+{
+    t_player *player = &vars->player;
+    t_mouse *mouse = &vars->mouse;
+
+    player->x = mouse->x;
+    player->y = mouse->y;
+    if (mouse->button & BUTTON_LEFT_ON)
+        player->angle -= 1;
+    if (mouse->button & BUTTON_RIGHT_ON)
+        player->angle += 1;
+
+    return 0;
+}
+
 int draw_player(t_vars *vars)
 {
     t_player *player = &vars->player;
@@ -28,6 +52,8 @@ int draw_player(t_vars *vars)
     int color = 0x000000ff;
     sprintf(str, "(%3d,%3d) %4d", player->x, player->y, player->angle);
     mlx_string_put(vars->mlx, vars->mlx_win, 10, 10, color, str);
+
+    draw_circle(&vars->img, player->x, player->y, 25, 0x00ff0000);
 
     return 0;
 }
