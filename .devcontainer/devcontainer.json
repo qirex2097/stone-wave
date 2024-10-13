@@ -1,0 +1,16 @@
+{
+    "name": "cub_3d",
+    "build": {
+                "context": "..",
+                "dockerfile": "Dockerfile"
+    },
+    "postCreateCommand": "git config --global --add safe.directory ${containerWorkspaceFolder}",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-vscode.cpptools-extension-pack",
+                "ms-vscode.makefile-tools"
+            ]
+        }
+    }
+}
