@@ -1,0 +1,2 @@
+main.o: main.c stone.h
+drawing.o: drawing.c stone.h
