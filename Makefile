@@ -10,7 +10,7 @@ LDFLAGS = -L$(MLX_DIR) -lmlx -lX11 -lXext
 TARGET = stone
 
 # ソースファイル
-SRCS = main.c drawing.c
+SRCS = main.c drawing.c player.c
 
 # オブジェクトファイルの指定（.c -> .o に変換）
 OBJS = $(SRCS:.c=.o)

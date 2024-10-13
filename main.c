@@ -2,21 +2,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <X11/X.h>
 #include "stone.h"
 
 int render_next_frame(void *param)
 {
     t_vars *vars = (t_vars *)param;
-    int x0, y0;
-    int x1, y1;
 
     memset(vars->img.addr, 0, WINDOW_W * WINDOW_H * (vars->img.bits_per_pixel / 8));
 
-    x0 = rand() % WINDOW_W;
-    y0 = rand() % WINDOW_H;
-    x1 = rand() % WINDOW_W;
-    y1 = rand() % WINDOW_H;
-    draw_line(&vars->img, x0, y0, x1, y1, 0x0000ff00);
+    draw_player(vars);
 
     mlx_put_image_to_window(vars->mlx, vars->mlx_win, vars->img.img, 0, 0);
 
@@ -33,9 +28,18 @@ int key_handler(int keycode, void *param)
     return 0;
 }
 
+int mouse_move_handler(int x, int y, void *param)
+{
+    t_vars *vars = (t_vars *)param;
+    t_player *player = &vars->player;
+    player->x = x;
+    player->y = y;
+    return 0;
+}
+
 int main(void)
 {
-    static t_vars vars;
+    t_vars vars;
 
     vars.mlx = mlx_init();
     if (vars.mlx == NULL)
@@ -57,8 +61,11 @@ int main(void)
     }
     vars.img.addr = mlx_get_data_addr(vars.img.img, &vars.img.bits_per_pixel, &vars.img.line_length, &vars.img.endian);
 
+    init_player(&vars.player);
+
     mlx_key_hook(vars.mlx_win, key_handler, &vars);
     mlx_loop_hook(vars.mlx, render_next_frame, &vars);
+    mlx_hook(vars.mlx_win, MotionNotify, PointerMotionMask, mouse_move_handler, &vars);
     mlx_loop(vars.mlx);
 
     return 0;
