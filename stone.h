@@ -8,8 +8,15 @@ typedef struct
     int bits_per_pixel;
     int line_length;
     int endian;
-} t_data;
+} t_img;
+
+typedef struct
+{
+    void *mlx;
+    void *mlx_win;
+    t_img img;
+} t_vars;
 
 /* drawing.c */
-void my_mlx_pixel_put(t_data *data, int x, int y, int color);
-void draw_line(t_data *data, int x0, int y0, int x1, int y1, int color);
+void my_mlx_pixel_put(t_img *data, int x, int y, int color);
+void draw_line(t_img *data, int x0, int y0, int x1, int y1, int color);
