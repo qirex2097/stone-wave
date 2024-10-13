@@ -1,12 +1,17 @@
 #include <mlx.h>
 #include "stone.h"
 
-void my_mlx_pixel_put(t_img *data, int x, int y, int color)
+int is_without_bounds(t_img *img, int x, int y)
 {
-    if (x < 0 || data->w <= x || y < 0 || data->h <= y)
+    return (x < 0 || img->w <= x || y < 0 || img->h <= y);
+}
+
+void my_mlx_pixel_put(t_img *img, int x, int y, int color)
+{
+    if (is_without_bounds(img, x, y))
         return;
     char *dst;
-    dst = data->addr + (y * data->line_length + x * (data->bits_per_pixel / 8));
+    dst = img->addr + (y * img->line_length + x * (img->bits_per_pixel / 8));
     *(unsigned int *)dst = color;
 }
 
@@ -38,11 +43,13 @@ void draw_line(t_img *data, int x0, int y0, int x1, int y1, int color)
     }
     err = dx - dy;
 
-    while (x0 != x1 && y0 != y1)
+    while (1)
     {
         int e2;
 
         my_mlx_pixel_put(data, x0, y0, color);
+        if (x0 == x1 && y0 == y1)
+            break;
         e2 = 2 * err;
         if (e2 > -dy)
         {

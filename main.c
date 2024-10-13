@@ -7,8 +7,9 @@
 
 #define BUTTON_LEFT 1
 #define BUTTON_RIGHT 3
+#define KEY_ESC 65307
 
-int cleanup(t_vars *vars);
+void cleanup(t_vars *vars);
 
 int render_next_frame(void *param)
 {
@@ -28,7 +29,7 @@ int key_handler(int keycode, void *param)
     t_vars *vars = param;
 
     printf("%d\n", keycode);
-    if (keycode == 65307)
+    if (keycode == KEY_ESC)
     {
         cleanup(vars);
         exit(0);
@@ -69,13 +70,12 @@ int mouse_up_handler(int button, int x, int y, void *param)
     return 0;
 }
 
-int cleanup(t_vars *vars)
+void cleanup(t_vars *vars)
 {
     mlx_destroy_image(vars->mlx, vars->img.img);
     mlx_destroy_window(vars->mlx, vars->mlx_win);
     mlx_destroy_display(vars->mlx);
     free(vars->mlx);
-    return 0;
 }
 
 int main(void)
@@ -88,7 +88,7 @@ int main(void)
         perror("Unable to initialize mlx");
         exit(1);
     }
-    vars.mlx_win = mlx_new_window(vars.mlx, WINDOW_W, WINDOW_H, "HELLO");
+    vars.mlx_win = mlx_new_window(vars.mlx, WINDOW_W, WINDOW_H, "Press ESC to exit");
     if (vars.mlx_win == NULL)
     {
         perror("Unable to initialize mlx_win");
@@ -108,10 +108,10 @@ int main(void)
     init_mouse(&vars.mouse);
 
     mlx_key_hook(vars.mlx_win, key_handler, &vars);
-    mlx_loop_hook(vars.mlx, render_next_frame, &vars);
     mlx_hook(vars.mlx_win, MotionNotify, PointerMotionMask, mouse_move_handler, &vars);
     mlx_hook(vars.mlx_win, ButtonPress, ButtonPressMask, mouse_down_handler, &vars);
     mlx_hook(vars.mlx_win, ButtonRelease, ButtonReleaseMask, mouse_up_handler, &vars);
+    mlx_loop_hook(vars.mlx, render_next_frame, &vars);
     mlx_loop(vars.mlx);
 
     return 0;

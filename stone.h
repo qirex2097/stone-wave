@@ -3,6 +3,7 @@
 
 #define BUTTON_LEFT_ON (1L << 0)
 #define BUTTON_RIGHT_ON (1L << 1)
+#define PI 3.14159265358979323846
 
 typedef struct
 {

@@ -1,10 +1,13 @@
 #include <mlx.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include "stone.h"
 
 int init_player(t_player *player)
 {
+    if (player == NULL)
+        return -1;
     player->x = 0;
     player->y = 0;
     player->angle = 0;
@@ -14,6 +17,8 @@ int init_player(t_player *player)
 
 int init_mouse(t_mouse *mouse)
 {
+    if (mouse == NULL)
+        return -1;
     mouse->x = 0;
     mouse->y = 0;
     mouse->button = 0;
@@ -42,18 +47,20 @@ int draw_player(t_vars *vars)
     int x0, y0;
     int x1, y1;
 
-    x0 = rand() % WINDOW_W;
-    y0 = rand() % WINDOW_H;
-    x1 = rand() % WINDOW_W;
-    y1 = rand() % WINDOW_H;
-    draw_line(&vars->img, x0, y0, x1, y1, 0x0000ff00);
+    int radius = 20;
+    int line_length = radius * 5;
+    double radian = player->angle * PI / 180.0;
+    x0 = player->x;
+    y0 = player->y;
+    x1 = x0 + (int)(line_length * cos(radian));
+    y1 = y0 + (int)(line_length * sin(radian));
+    draw_circle(&vars->img, player->x, player->y, radius, 0x00ff0000);
+    draw_line(&vars->img, x0, y0, x1, y1, 0x00ff0000);
 
     char str[100];
     int color = 0x000000ff;
-    sprintf(str, "(%3d,%3d) %4d", player->x, player->y, player->angle);
+    snprintf(str, sizeof(str), "(%3d,%3d) %4d -> (%3d,%3d)", player->x, player->y, player->angle, x1, y1);
     mlx_string_put(vars->mlx, vars->mlx_win, 10, 10, color, str);
-
-    draw_circle(&vars->img, player->x, player->y, 25, 0x00ff0000);
 
     return 0;
 }
