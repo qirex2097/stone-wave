@@ -46,16 +46,35 @@ int draw_player(t_vars *vars)
     t_player *player = &vars->player;
     t_line way;
 
-    int radius = 20;
-    int line_length = radius * 5;
-    double radian = player->angle * PI / 180.0;
+    t_line line0;
+    line0.p0.x = 100;
+    line0.p0.y = 100;
+    line0.p1.x = 300;
+    line0.p1.y = 200;
+    draw_line(&vars->img, &line0, 0x0000ff80);
+
     way.p0.x = player->x;
     way.p0.y = player->y;
-    way.p1.x = player->x + (int)(line_length * cos(radian));
-    way.p1.y = player->y + (int)(line_length * sin(radian));
+    int radius = 20;
     draw_circle(&vars->img, &way.p0, radius, 0x00ff0000);
-    draw_line(&vars->img, &way, 0x00ff0000);
 
+    int line_length = radius * 5;
+    int i = 0;
+    while (i < 7)
+    {
+        t_pos cross_point;
+        int color = 0x0000ff00;
+        double radian = (player->angle + (i - 3) * 10) * PI / 180.0;
+        way.p1.x = player->x + (int)(line_length * cos(radian));
+        way.p1.y = player->y + (int)(line_length * sin(radian));
+        if (do_intersect(&line0, &way) && get_intersection(&line0, &way, &cross_point))
+        {
+            color = 0x00ff0000;
+            draw_circle(&vars->img, &cross_point, 10, color);
+        }
+        draw_line(&vars->img, &way, color);
+        i++;
+    }
     char str[100];
     int color = 0x000000ff;
     snprintf(str, sizeof(str), "(%3d,%3d) %4d -> (%3d,%3d)", player->x, player->y, player->angle, way.p1.x, way.p1.y);

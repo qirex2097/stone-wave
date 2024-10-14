@@ -5,6 +5,10 @@
 #define BUTTON_RIGHT_ON (1L << 1)
 #define PI 3.14159265358979323846
 
+#define COLLINEAR 0
+#define CLOCKWISE 1
+#define COUNTERCLOCKWISE 2
+
 typedef struct
 {
     int x, y;
@@ -52,6 +56,8 @@ void my_mlx_pixel_put(t_img *data, int x, int y, int color);
 void my_mlx_draw_line(t_img *data, int x0, int y0, int x1, int y1, int color);
 void draw_line(t_img *data, t_line *line, int color);
 void draw_circle(t_img *img, t_pos *center, int radius, int color);
+int do_intersect(t_line *line1, t_line *line2);
+int get_intersection(t_line *line0, t_line *line1, t_pos *cross_point);
 
 /* player.c */
 int init_player(t_player *player);
