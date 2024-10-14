@@ -14,12 +14,14 @@ void cleanup(t_vars *vars);
 int render_next_frame(void *param)
 {
     t_vars *vars = (t_vars *)param;
+    t_img *img = (t_img *)&vars->img;
+
+    mlx_put_image_to_window(vars->mlx, vars->mlx_win, img->img, 0, 0);
 
     update_player(vars);
 
-    memset(vars->img.addr, 0, WINDOW_W * WINDOW_H * (vars->img.bits_per_pixel / 8));
+    memset(img->addr, 0, WINDOW_W * WINDOW_H * (img->bits_per_pixel / 8));
     draw_player(vars);
-    mlx_put_image_to_window(vars->mlx, vars->mlx_win, vars->img.img, 0, 0);
 
     return 0;
 }

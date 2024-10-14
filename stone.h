@@ -7,6 +7,16 @@
 
 typedef struct
 {
+    int x, y;
+} t_pos;
+
+typedef struct
+{
+    t_pos p0, p1;
+} t_line;
+
+typedef struct
+{
     void *img;
     char *addr;
     int bits_per_pixel;
@@ -39,8 +49,9 @@ typedef struct
 
 /* drawing.c */
 void my_mlx_pixel_put(t_img *data, int x, int y, int color);
-void draw_line(t_img *data, int x0, int y0, int x1, int y1, int color);
-void draw_circle(t_img *img, int x_center, int y_center, int radius, int color);
+void my_mlx_draw_line(t_img *data, int x0, int y0, int x1, int y1, int color);
+void draw_line(t_img *data, t_line *line, int color);
+void draw_circle(t_img *img, t_pos *center, int radius, int color);
 
 /* player.c */
 int init_player(t_player *player);

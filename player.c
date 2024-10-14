@@ -44,22 +44,21 @@ int update_player(t_vars *vars)
 int draw_player(t_vars *vars)
 {
     t_player *player = &vars->player;
-    int x0, y0;
-    int x1, y1;
+    t_line way;
 
     int radius = 20;
     int line_length = radius * 5;
     double radian = player->angle * PI / 180.0;
-    x0 = player->x;
-    y0 = player->y;
-    x1 = x0 + (int)(line_length * cos(radian));
-    y1 = y0 + (int)(line_length * sin(radian));
-    draw_circle(&vars->img, player->x, player->y, radius, 0x00ff0000);
-    draw_line(&vars->img, x0, y0, x1, y1, 0x00ff0000);
+    way.p0.x = player->x;
+    way.p0.y = player->y;
+    way.p1.x = player->x + (int)(line_length * cos(radian));
+    way.p1.y = player->y + (int)(line_length * sin(radian));
+    draw_circle(&vars->img, &way.p0, radius, 0x00ff0000);
+    draw_line(&vars->img, &way, 0x00ff0000);
 
     char str[100];
     int color = 0x000000ff;
-    snprintf(str, sizeof(str), "(%3d,%3d) %4d -> (%3d,%3d)", player->x, player->y, player->angle, x1, y1);
+    snprintf(str, sizeof(str), "(%3d,%3d) %4d -> (%3d,%3d)", player->x, player->y, player->angle, way.p1.x, way.p1.y);
     mlx_string_put(vars->mlx, vars->mlx_win, 10, 10, color, str);
 
     return 0;

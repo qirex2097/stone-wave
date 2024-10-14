@@ -1,21 +1,21 @@
 #include <mlx.h>
 #include "stone.h"
 
-int is_without_bounds(t_img *img, int x, int y)
+int is_without_bounds(int x, int y, int w, int h)
 {
-    return (x < 0 || img->w <= x || y < 0 || img->h <= y);
+    return (x < 0 || w <= x || y < 0 || h <= y);
 }
 
 void my_mlx_pixel_put(t_img *img, int x, int y, int color)
 {
-    if (is_without_bounds(img, x, y))
+    if (is_without_bounds(x, y, img->w, img->h))
         return;
     char *dst;
     dst = img->addr + (y * img->line_length + x * (img->bits_per_pixel / 8));
     *(unsigned int *)dst = color;
 }
 
-void draw_line(t_img *data, int x0, int y0, int x1, int y1, int color)
+void my_mlx_draw_line(t_img *data, int x0, int y0, int x1, int y1, int color)
 {
     int dx, dy;
     int sx, sy;
@@ -64,8 +64,10 @@ void draw_line(t_img *data, int x0, int y0, int x1, int y1, int color)
     }
 }
 
-void draw_circle(t_img *img, int x_center, int y_center, int radius, int color)
+void draw_circle(t_img *img, t_pos *center, int radius, int color)
 {
+    int x_center = center->x;
+    int y_center = center->y;
     int x = radius;
     int y = 0;
     int decision = 1 - radius;
@@ -93,4 +95,9 @@ void draw_circle(t_img *img, int x_center, int y_center, int radius, int color)
             decision += 2 * (y - x) + 1;
         }
     }
+}
+
+void draw_line(t_img *data, t_line *line, int color)
+{
+    my_mlx_draw_line(data, line->p0.x, line->p0.y, line->p1.x, line->p1.y, color);
 }
