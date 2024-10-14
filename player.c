@@ -30,9 +30,14 @@ int update_player(t_vars *vars)
 {
     t_player *player = &vars->player;
     t_mouse *mouse = &vars->mouse;
+    t_pos screen, field;
 
-    player->x = mouse->x;
-    player->y = mouse->y;
+    screen.x = mouse->x;
+    screen.y = mouse->y;
+    convert_to_field(&screen, &field);
+
+    player->x = field.x;
+    player->y = field.y;
     if (mouse->button & BUTTON_LEFT_ON)
         player->angle -= 1;
     if (mouse->button & BUTTON_RIGHT_ON)
@@ -47,10 +52,10 @@ int draw_player(t_vars *vars)
     t_line way;
 
     t_line line0;
-    line0.p0.x = 100;
-    line0.p0.y = 100;
-    line0.p1.x = 300;
-    line0.p1.y = 200;
+    line0.p0.x = -500;
+    line0.p0.y = -250;
+    line0.p1.x = 0;
+    line0.p1.y = 0;
     draw_line(&vars->img, &line0, 0x0000ff80);
 
     way.p0.x = player->x;
@@ -75,8 +80,9 @@ int draw_player(t_vars *vars)
         draw_line(&vars->img, &way, color);
         i++;
     }
+
     char str[100];
-    int color = 0x000000ff;
+    int color = 0x00ffffff;
     snprintf(str, sizeof(str), "(%3d,%3d) %4d -> (%3d,%3d)", player->x, player->y, player->angle, way.p1.x, way.p1.y);
     mlx_string_put(vars->mlx, vars->mlx_win, 10, 10, color, str);
 

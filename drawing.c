@@ -64,7 +64,7 @@ void my_mlx_draw_line(t_img *data, int x0, int y0, int x1, int y1, int color)
     }
 }
 
-void draw_circle(t_img *img, t_pos *center, int radius, int color)
+void draw_circle_s(t_img *img, t_pos *center, int radius, int color)
 {
     int x_center = center->x;
     int y_center = center->y;
@@ -97,7 +97,7 @@ void draw_circle(t_img *img, t_pos *center, int radius, int color)
     }
 }
 
-void draw_line(t_img *data, t_line *line, int color)
+void draw_line_s(t_img *data, t_line *line, int color)
 {
     my_mlx_draw_line(data, line->p0.x, line->p0.y, line->p1.x, line->p1.y, color);
 }
@@ -161,4 +161,31 @@ int get_intersection(t_line *line0, t_line *line1, t_pos *cross_point)
     cross_point->y = num_y / denom;
 
     return 1;
+}
+
+void convert_to_screen(t_pos *field, t_pos *screen)
+{
+    screen->x = (field->x + FIELD_W / 2) * WINDOW_W / FIELD_W;
+    screen->y = (field->y + FIELD_H / 2) * WINDOW_H / FIELD_H;
+}
+
+void convert_to_field(t_pos *screen, t_pos *field)
+{
+    field->x = screen->x * FIELD_W / WINDOW_W - FIELD_W / 2;
+    field->y = screen->y * FIELD_H / WINDOW_H - FIELD_H / 2;
+}
+
+void draw_line(t_img *data, t_line *line, int color)
+{
+    t_pos p0, p1;
+    convert_to_screen(&line->p0, &p0);
+    convert_to_screen(&line->p1, &p1);
+    my_mlx_draw_line(data, p0.x, p0.y, p1.x, p1.y, color);
+}
+
+void draw_circle(t_img *img, t_pos *center, int radius, int color)
+{
+    t_pos screen;
+    convert_to_screen(center, &screen);
+    draw_circle_s(img, &screen, radius, color);
 }
