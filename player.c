@@ -30,11 +30,12 @@ int update_player(t_vars *vars)
 {
     t_player *player = &vars->player;
     t_mouse *mouse = &vars->mouse;
+    t_img *img = &vars->img;
     t_pos screen, field;
 
     screen.x = mouse->x;
     screen.y = mouse->y;
-    convert_to_field(&screen, &field);
+    convert_to_field(&screen, &field, img->field_x, img->field_y, img->field_w, img->field_h);
 
     player->x = field.x;
     player->y = field.y;

@@ -8,6 +8,8 @@
 #define BUTTON_LEFT 1
 #define BUTTON_RIGHT 3
 #define KEY_ESC 65307
+#define KEY_PGUP 65365
+#define KEY_PGDN 65366
 
 void cleanup(t_vars *vars);
 
@@ -29,12 +31,23 @@ int render_next_frame(void *param)
 int key_handler(int keycode, void *param)
 {
     t_vars *vars = param;
+    t_img *img = &vars->img;
 
     printf("%d\n", keycode);
     if (keycode == KEY_ESC)
     {
         cleanup(vars);
         exit(0);
+    }
+    if (keycode == KEY_PGUP)
+    {
+        img->field_w -= 10;
+        img->field_h -= 10;
+    }
+    if (keycode == KEY_PGDN)
+    {
+        img->field_w += 10;
+        img->field_h += 10;
     }
     return 0;
 }
@@ -97,13 +110,17 @@ int main(void)
         exit(1);
     }
     vars.img.img = mlx_new_image(vars.mlx, WINDOW_W, WINDOW_H);
-    vars.img.w = WINDOW_W;
-    vars.img.h = WINDOW_H;
     if (vars.img.img == NULL)
     {
         perror("Unable to initialize image");
         exit(1);
     }
+    vars.img.w = WINDOW_W;
+    vars.img.h = WINDOW_H;
+    vars.img.field_x = 0 - FIELD_W / 2;
+    vars.img.field_y = 0 - FIELD_H / 2;
+    vars.img.field_w = FIELD_W / 2;
+    vars.img.field_h = FIELD_H / 2;
     vars.img.addr = mlx_get_data_addr(vars.img.img, &vars.img.bits_per_pixel, &vars.img.line_length, &vars.img.endian);
 
     init_player(&vars.player);

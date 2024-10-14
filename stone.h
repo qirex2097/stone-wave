@@ -32,12 +32,13 @@ typedef struct
     int line_length;
     int endian;
     int w, h;
+    int field_x, field_y;
+    int field_w, field_h;
 } t_img;
 
 typedef struct
 {
-    int x;
-    int y;
+    int x, y;
     int angle;
 } t_player;
 
@@ -63,8 +64,8 @@ void draw_line_s(t_img *data, t_line *line, int color);
 void draw_circle_s(t_img *img, t_pos *center, int radius, int color);
 int do_intersect(t_line *line1, t_line *line2);
 int get_intersection(t_line *line0, t_line *line1, t_pos *cross_point);
-void convert_to_screen(t_pos *field, t_pos *screen);
-void convert_to_field(t_pos *screen, t_pos *field);
+void convert_to_screen(t_pos *field, t_pos *screen, int x0, int y0, int w, int h);
+void convert_to_field(t_pos *screen, t_pos *field, int x0, int y0, int w, int h);
 void draw_line(t_img *data, t_line *line, int color);
 void draw_circle(t_img *img, t_pos *center, int radius, int color);
 

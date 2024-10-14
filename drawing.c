@@ -163,29 +163,65 @@ int get_intersection(t_line *line0, t_line *line1, t_pos *cross_point)
     return 1;
 }
 
-void convert_to_screen(t_pos *field, t_pos *screen)
+void convert_to_screen(t_pos *field, t_pos *screen, int x0, int y0, int w, int h)
 {
-    screen->x = (field->x + FIELD_W / 2) * WINDOW_W / FIELD_W;
-    screen->y = (field->y + FIELD_H / 2) * WINDOW_H / FIELD_H;
+    screen->x = (field->x - x0) * WINDOW_W / w;
+    screen->y = (field->y - y0) * WINDOW_H / h;
 }
 
-void convert_to_field(t_pos *screen, t_pos *field)
+void convert_to_field(t_pos *screen, t_pos *field, int x0, int y0, int w, int h)
 {
-    field->x = screen->x * FIELD_W / WINDOW_W - FIELD_W / 2;
-    field->y = screen->y * FIELD_H / WINDOW_H - FIELD_H / 2;
+    field->x = screen->x * w / WINDOW_W + x0;
+    field->y = screen->y * h / WINDOW_H + y0;
 }
 
-void draw_line(t_img *data, t_line *line, int color)
+void put_pixel(t_img *img, int x, int y, int color)
+{
+    t_pos pos;
+    t_pos screen;
+    pos.x = x;
+    pos.y = y;
+    convert_to_screen(&pos, &screen, img->field_x, img->field_y, img->field_w, img->field_h);
+    my_mlx_pixel_put(img, screen.x, screen.y, color);
+}
+
+void draw_line(t_img *img, t_line *line, int color)
 {
     t_pos p0, p1;
-    convert_to_screen(&line->p0, &p0);
-    convert_to_screen(&line->p1, &p1);
-    my_mlx_draw_line(data, p0.x, p0.y, p1.x, p1.y, color);
+    convert_to_screen(&line->p0, &p0, img->field_x, img->field_y, img->field_w, img->field_h);
+    convert_to_screen(&line->p1, &p1, img->field_x, img->field_y, img->field_w, img->field_h);
+    my_mlx_draw_line(img, p0.x, p0.y, p1.x, p1.y, color);
 }
 
 void draw_circle(t_img *img, t_pos *center, int radius, int color)
 {
-    t_pos screen;
-    convert_to_screen(center, &screen);
-    draw_circle_s(img, &screen, radius, color);
+    int x_center = center->x;
+    int y_center = center->y;
+    int x = radius;
+    int y = 0;
+    int decision = 1 - radius;
+
+    while (x >= y)
+    {
+        put_pixel(img, x_center + x, y_center + y, color);
+        put_pixel(img, x_center - x, y_center + y, color);
+        put_pixel(img, x_center + x, y_center - y, color);
+        put_pixel(img, x_center - x, y_center - y, color);
+        put_pixel(img, x_center + y, y_center + x, color);
+        put_pixel(img, x_center - y, y_center + x, color);
+        put_pixel(img, x_center + y, y_center - x, color);
+        put_pixel(img, x_center - y, y_center - x, color);
+
+        y++;
+
+        if (decision <= 0)
+        {
+            decision += 2 * y + 1;
+        }
+        else
+        {
+            x--;
+            decision += 2 * (y - x) + 1;
+        }
+    }
 }
