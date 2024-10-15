@@ -125,6 +125,13 @@ void cleanup(t_vars *vars)
     free(vars->mlx);
 }
 
+int cross_button_handler(void *param)
+{
+    t_vars *vars = param;
+    cleanup(vars);
+    exit(0);
+}
+
 int main(void)
 {
     t_vars vars;
@@ -170,7 +177,7 @@ int main(void)
     mlx_hook(vars.mlx_win, ButtonPress, ButtonPressMask, mouse_down_handler, &vars);
     // mlx_hook(vars.mlx_win, ButtonRelease, ButtonReleaseMask, mouse_up_handler, &vars);
     mlx_loop_hook(vars.mlx, render_next_frame, &vars);
-    mlx_hook(vars.mlx_win, DestroyNotify, StructureNotifyMask, (int (*)(void))cleanup, &vars);
+    mlx_hook(vars.mlx_win, DestroyNotify, StructureNotifyMask, cross_button_handler, &vars);
     mlx_loop(vars.mlx);
 
     return 0;
