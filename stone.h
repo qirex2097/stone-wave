@@ -6,13 +6,25 @@
 #define WINDOW_W 800
 #define WINDOW_H 800
 
-#define BUTTON_LEFT_ON (1L << 0)
-#define BUTTON_RIGHT_ON (1L << 1)
+#define TURN_LEFT (1L << 0)
+#define TURN_RIGHT (1L << 1)
+#define MOVE_UP (1L << 2)
+#define MOVE_DOWN (1L << 3)
+#define MOVE_LEFT (1L << 4)
+#define MOVE_RIGHT (1L << 5)
+#define SCALE_UP (1L << 6)
+#define SCALE_DOWN (1L << 7)
+#define CENTER (1L << 8)
 #define PI 3.14159265358979323846
 
 #define COLLINEAR 0
 #define CLOCKWISE 1
 #define COUNTERCLOCKWISE 2
+
+typedef struct
+{
+    int x, y;
+} t_pos_s;
 
 typedef struct
 {
@@ -44,7 +56,7 @@ typedef struct
 
 typedef struct
 {
-    int x, y;
+    t_pos_s pos;
     unsigned long button;
 } t_mouse;
 
@@ -64,8 +76,8 @@ void draw_line_s(t_img *data, t_line *line, int color);
 void draw_circle_s(t_img *img, t_pos *center, int radius, int color);
 int do_intersect(t_line *line1, t_line *line2);
 int get_intersection(t_line *line0, t_line *line1, t_pos *cross_point);
-void convert_to_screen(t_pos *field, t_pos *screen, int x0, int y0, int w, int h);
-void convert_to_field(t_pos *screen, t_pos *field, int x0, int y0, int w, int h);
+void convert_to_screen(t_pos *field, t_pos_s *screen, int x0, int y0, int w, int h);
+void convert_to_field(t_pos_s *screen, t_pos *field, int x0, int y0, int w, int h);
 void draw_line(t_img *data, t_line *line, int color);
 void draw_circle(t_img *img, t_pos *center, int radius, int color);
 

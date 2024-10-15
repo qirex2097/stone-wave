@@ -19,8 +19,8 @@ int init_mouse(t_mouse *mouse)
 {
     if (mouse == NULL)
         return -1;
-    mouse->x = 0;
-    mouse->y = 0;
+    mouse->pos.x = 0;
+    mouse->pos.y = 0;
     mouse->button = 0;
 
     return 0;
@@ -31,18 +31,47 @@ int update_player(t_vars *vars)
     t_player *player = &vars->player;
     t_mouse *mouse = &vars->mouse;
     t_img *img = &vars->img;
-    t_pos screen, field;
+    int dx, dy, dangle;
 
-    screen.x = mouse->x;
-    screen.y = mouse->y;
-    convert_to_field(&screen, &field, img->field_x, img->field_y, img->field_w, img->field_h);
-
-    player->x = field.x;
-    player->y = field.y;
-    if (mouse->button & BUTTON_LEFT_ON)
-        player->angle -= 1;
-    if (mouse->button & BUTTON_RIGHT_ON)
-        player->angle += 1;
+    dx = dy = 5;
+    dangle = 1;
+    if (mouse->button & TURN_LEFT)
+        player->angle -= dangle;
+    if (mouse->button & TURN_RIGHT)
+        player->angle += dangle;
+    if (mouse->button & MOVE_UP)
+        player->y -= dy;
+    if (mouse->button & MOVE_DOWN)
+        player->y += dy;
+    if (mouse->button & MOVE_LEFT)
+        player->x -= dx;
+    if (mouse->button & MOVE_RIGHT)
+        player->x += dx;
+    if (mouse->button & SCALE_UP)
+    {
+        img->field_h -= 8;
+        img->field_w -= 8;
+        img->field_x += 4;
+        img->field_y += 4;
+        mouse->button &= ~(SCALE_UP);
+    }
+    if (mouse->button & SCALE_DOWN)
+    {
+        img->field_h += 8;
+        img->field_w += 8;
+        img->field_x -= 4;
+        img->field_y -= 4;
+        mouse->button &= ~(SCALE_DOWN);
+    }
+    if (mouse->button & CENTER)
+    {
+        t_pos pos;
+        convert_to_field(&mouse->pos, &pos, img->field_x, img->field_y, img->field_w, img->field_h);
+        img->field_x = pos.x - img->field_w / 2;
+        img->field_y = pos.y - img->field_h / 2;
+        printf("(%d,%d)\n", img->field_x, img->field_y);
+        mouse->button &= ~(CENTER);
+    }
 
     return 0;
 }

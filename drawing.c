@@ -163,13 +163,13 @@ int get_intersection(t_line *line0, t_line *line1, t_pos *cross_point)
     return 1;
 }
 
-void convert_to_screen(t_pos *field, t_pos *screen, int x0, int y0, int w, int h)
+void convert_to_screen(t_pos *field, t_pos_s *screen, int x0, int y0, int w, int h)
 {
     screen->x = (field->x - x0) * WINDOW_W / w;
     screen->y = (field->y - y0) * WINDOW_H / h;
 }
 
-void convert_to_field(t_pos *screen, t_pos *field, int x0, int y0, int w, int h)
+void convert_to_field(t_pos_s *screen, t_pos *field, int x0, int y0, int w, int h)
 {
     field->x = screen->x * w / WINDOW_W + x0;
     field->y = screen->y * h / WINDOW_H + y0;
@@ -178,7 +178,7 @@ void convert_to_field(t_pos *screen, t_pos *field, int x0, int y0, int w, int h)
 void put_pixel(t_img *img, int x, int y, int color)
 {
     t_pos pos;
-    t_pos screen;
+    t_pos_s screen;
     pos.x = x;
     pos.y = y;
     convert_to_screen(&pos, &screen, img->field_x, img->field_y, img->field_w, img->field_h);
@@ -187,7 +187,7 @@ void put_pixel(t_img *img, int x, int y, int color)
 
 void draw_line(t_img *img, t_line *line, int color)
 {
-    t_pos p0, p1;
+    t_pos_s p0, p1;
     convert_to_screen(&line->p0, &p0, img->field_x, img->field_y, img->field_w, img->field_h);
     convert_to_screen(&line->p1, &p1, img->field_x, img->field_y, img->field_w, img->field_h);
     my_mlx_draw_line(img, p0.x, p0.y, p1.x, p1.y, color);

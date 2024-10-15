@@ -1,8 +1,8 @@
 {
     "name": "cub_3d",
     "build": {
-                "context": "..",
-                "dockerfile": "Dockerfile"
+        "context": "..",
+        "dockerfile": "Dockerfile"
     },
     "postCreateCommand": "git config --global --add safe.directory ${containerWorkspaceFolder}",
     "customizations": {
