@@ -1,14 +1,14 @@
 #include <mlx.h>
 #include "stone.h"
 
-int is_without_bounds(int x, int y, int w, int h)
+int is_out_of_bounds(int x, int y, int w, int h)
 {
     return (x < 0 || w <= x || y < 0 || h <= y);
 }
 
 void my_mlx_pixel_put(t_img *img, int x, int y, int color)
 {
-    if (is_without_bounds(x, y, img->w, img->h))
+    if (is_out_of_bounds(x, y, img->w, img->h))
         return;
     char *dst;
     dst = img->addr + (y * img->line_length + x * (img->bits_per_pixel / 8));
@@ -104,7 +104,7 @@ void draw_line_s(t_img *data, t_line *line, int color)
 
 int orientation(t_pos *p1, t_pos *p2, t_pos *p3)
 {
-    int val = (p2->y - p1->y) * (p3->x - p2->x) - (p2->x - p1->x) * (p3->y - p2->y);
+    long long val = (p2->y - p1->y) * (p3->x - p2->x) - (p2->x - p1->x) * (p3->y - p2->y);
     if (val == 0)
         return COLLINEAR;
     return (val > 0) ? CLOCKWISE : COUNTERCLOCKWISE;
@@ -165,6 +165,8 @@ int get_intersection(t_line *line0, t_line *line1, t_pos *cross_point)
 
 void convert_to_screen(t_pos *field, t_pos_s *screen, int x0, int y0, int w, int h)
 {
+    if (w == 0 || h == 0)
+        return;
     screen->x = (field->x - x0) * WINDOW_W / w;
     screen->y = (field->y - y0) * WINDOW_H / h;
 }

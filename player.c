@@ -4,6 +4,12 @@
 #include <math.h>
 #include "stone.h"
 
+#define SCALE_STEP 8
+#define PLAYER_RADIUS 20
+#define LINE_LENGTH 100
+#define PLAYER_COLOR 0x00ff0000
+#define TEXT_COLOR 0x00ffffff
+
 int init_player(t_player *player)
 {
     if (player == NULL)
@@ -28,6 +34,8 @@ int init_mouse(t_mouse *mouse)
 
 int update_player(t_vars *vars)
 {
+    if (vars == NULL)
+        return -1;
     t_player *player = &vars->player;
     t_mouse *mouse = &vars->mouse;
     t_img *img = &vars->img;
@@ -39,6 +47,7 @@ int update_player(t_vars *vars)
         player->angle -= dangle;
     if (mouse->button & TURN_RIGHT)
         player->angle += dangle;
+    player->angle = (player->angle + 360) % 360;
     if (mouse->button & MOVE_UP)
         player->y -= dy;
     if (mouse->button & MOVE_DOWN)
@@ -49,18 +58,18 @@ int update_player(t_vars *vars)
         player->x += dx;
     if (mouse->button & SCALE_UP)
     {
-        img->field_h -= 8;
-        img->field_w -= 8;
-        img->field_x += 4;
-        img->field_y += 4;
+        img->field_h -= SCALE_STEP;
+        img->field_w -= SCALE_STEP;
+        img->field_x += SCALE_STEP / 2;
+        img->field_y += SCALE_STEP / 2;
         mouse->button &= ~(SCALE_UP);
     }
     if (mouse->button & SCALE_DOWN)
     {
-        img->field_h += 8;
-        img->field_w += 8;
-        img->field_x -= 4;
-        img->field_y -= 4;
+        img->field_h += SCALE_STEP;
+        img->field_w += SCALE_STEP;
+        img->field_x -= SCALE_STEP / 2;
+        img->field_y -= SCALE_STEP / 2;
         mouse->button &= ~(SCALE_DOWN);
     }
     if (mouse->button & CENTER)
@@ -69,19 +78,19 @@ int update_player(t_vars *vars)
         convert_to_field(&mouse->pos, &pos, img->field_x, img->field_y, img->field_w, img->field_h);
         img->field_x = pos.x - img->field_w / 2;
         img->field_y = pos.y - img->field_h / 2;
-        printf("(%d,%d)\n", img->field_x, img->field_y);
+        // printf("(%d,%d)\n", img->field_x, img->field_y);
         mouse->button &= ~(CENTER);
     }
 
     return 0;
 }
 
-int draw_player(t_vars *vars)
+int draw_player_lines(t_vars *vars)
 {
     t_player *player = &vars->player;
-    t_line way;
+    t_line way, line0;
 
-    t_line line0;
+    // 壁(line0)の描画
     line0.p0.x = -500;
     line0.p0.y = -250;
     line0.p1.x = 0;
@@ -90,10 +99,10 @@ int draw_player(t_vars *vars)
 
     way.p0.x = player->x;
     way.p0.y = player->y;
-    int radius = 20;
-    draw_circle(&vars->img, &way.p0, radius, 0x00ff0000);
+    int radius = PLAYER_RADIUS;
+    draw_circle(&vars->img, &way.p0, radius, PLAYER_COLOR);
 
-    int line_length = radius * 5;
+    int line_length = LINE_LENGTH;
     int i = 0;
     while (i < 7)
     {
@@ -110,11 +119,21 @@ int draw_player(t_vars *vars)
         draw_line(&vars->img, &way, color);
         i++;
     }
+}
+
+int render_player_info(t_vars *vars)
+{
+    t_player *player = &vars->player;
 
     char str[100];
-    int color = 0x00ffffff;
-    snprintf(str, sizeof(str), "(%3d,%3d) %4d -> (%3d,%3d)", player->x, player->y, player->angle, way.p1.x, way.p1.y);
-    mlx_string_put(vars->mlx, vars->mlx_win, 10, 10, color, str);
+    snprintf(str, sizeof(str), "(%3d,%3d) %4d", player->x, player->y, player->angle);
+    mlx_string_put(vars->mlx, vars->mlx_win, 10, 10, TEXT_COLOR, str);
+}
+
+int draw_player(t_vars *vars)
+{
+    draw_player_lines(vars);
+    render_player_info(vars);
 
     return 0;
 }

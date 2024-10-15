@@ -139,12 +139,17 @@ int main(void)
     if (vars.mlx_win == NULL)
     {
         perror("Unable to initialize mlx_win");
+        mlx_destroy_display(vars.mlx);
+        free(vars.mlx);
         exit(1);
     }
     vars.img.img = mlx_new_image(vars.mlx, WINDOW_W, WINDOW_H);
     if (vars.img.img == NULL)
     {
         perror("Unable to initialize image");
+        mlx_destroy_window(vars.mlx, vars.mlx_win);
+        mlx_destroy_display(vars.mlx);
+        free(vars.mlx);
         exit(1);
     }
     vars.img.w = WINDOW_W;
@@ -165,6 +170,7 @@ int main(void)
     mlx_hook(vars.mlx_win, ButtonPress, ButtonPressMask, mouse_down_handler, &vars);
     // mlx_hook(vars.mlx_win, ButtonRelease, ButtonReleaseMask, mouse_up_handler, &vars);
     mlx_loop_hook(vars.mlx, render_next_frame, &vars);
+    mlx_hook(vars.mlx_win, DestroyNotify, StructureNotifyMask, (int (*)(void))cleanup, &vars);
     mlx_loop(vars.mlx);
 
     return 0;
