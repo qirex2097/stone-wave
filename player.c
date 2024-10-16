@@ -88,14 +88,7 @@ int update_player(t_vars *vars)
 int draw_player_lines(t_vars *vars)
 {
     t_player *player = &vars->player;
-    t_line way, line0;
-
-    // 壁(line0)の描画
-    line0.p0.x = -500;
-    line0.p0.y = -250;
-    line0.p1.x = 0;
-    line0.p1.y = 0;
-    draw_line(&vars->img, &line0, 0x0000ff80);
+    t_line way;
 
     way.p0.x = player->x;
     way.p0.y = player->y;
@@ -111,12 +104,19 @@ int draw_player_lines(t_vars *vars)
         double radian = (player->angle + (i - 3) * 10) * PI / 180.0;
         way.p1.x = player->x + (int)(line_length * cos(radian));
         way.p1.y = player->y + (int)(line_length * sin(radian));
-        if (do_intersect(&line0, &way) && get_intersection(&line0, &way, &cross_point))
-        {
-            color = 0x00ff0000;
-            draw_circle(&vars->img, &cross_point, 10, color);
-        }
         draw_line(&vars->img, &way, color);
+
+        int j = 0;
+        t_line *wall;
+        while (wall = get_wall(j))
+        {
+            if (do_intersect(wall, &way) && get_intersection(wall, &way, &cross_point))
+            {
+                color = 0x00ff0000;
+                draw_circle(&vars->img, &cross_point, 10, color);
+            }
+            j++;
+        }
         i++;
     }
 }

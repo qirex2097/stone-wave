@@ -87,4 +87,9 @@ int init_mouse(t_mouse *mouse);
 int update_player(t_vars *vars);
 int draw_player(t_vars *vars);
 
+/* wall.c */
+int init_wall();
+int draw_wall(t_vars *vars);
+t_line *get_wall(int idx);
+
 #endif //_STONE_H_

@@ -39,6 +39,7 @@ int render_next_frame(void *param)
 
     memset(img->addr, 0, WINDOW_W * WINDOW_H * (img->bits_per_pixel / 8));
     draw_player(vars);
+    draw_wall(vars);
 
     return 0;
 }
@@ -163,11 +164,12 @@ int main(void)
     vars.img.h = WINDOW_H;
     vars.img.field_x = 0 - FIELD_W / 2;
     vars.img.field_y = 0 - FIELD_H / 2;
-    vars.img.field_w = FIELD_W / 2;
-    vars.img.field_h = FIELD_H / 2;
+    vars.img.field_w = FIELD_W;
+    vars.img.field_h = FIELD_H;
     vars.img.addr = mlx_get_data_addr(vars.img.img, &vars.img.bits_per_pixel, &vars.img.line_length, &vars.img.endian);
 
     init_player(&vars.player);
+    init_wall();
     init_mouse(&vars.mouse);
 
     mlx_do_key_autorepeatoff(vars.mlx);
