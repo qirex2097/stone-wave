@@ -26,6 +26,9 @@
 #define KEY_K 107
 #define KEY_L 108
 
+#define MINIWINDOW_W 160
+#define MINIWINDOW_H 120
+
 void cleanup(t_vars *vars);
 
 int render_next_frame(void *param)
@@ -36,10 +39,15 @@ int render_next_frame(void *param)
     mlx_put_image_to_window(vars->mlx, vars->mlx_win, img->img, 0, 0);
 
     update_player(vars);
+    update_wall(vars);
 
     memset(img->addr, 0, WINDOW_W * WINDOW_H * (img->bits_per_pixel / 8));
     draw_player(vars);
     draw_wall(vars);
+
+    if (vars->mouse.button & SHOW_MINIWINDOW)
+        mlx_put_image_to_window(vars->mlx, vars->mlx_win, vars->img2.img, 0, 0);
+    memset(vars->img2.addr, 0xc0808080, MINIWINDOW_W * MINIWINDOW_H * (vars->img2.bits_per_pixel / 8));
 
     return 0;
 }
@@ -99,6 +107,16 @@ int mouse_down_handler(int button, int x, int y, void *param)
 {
     t_vars *vars = param;
     t_mouse *mouse = &vars->mouse;
+
+    switch (button)
+    {
+    case BUTTON_RIGHT:
+        if (mouse->button & SHOW_MINIWINDOW)
+            mouse->button &= ~(SHOW_MINIWINDOW);
+        else
+            mouse->button |= SHOW_MINIWINDOW;
+        break;
+    }
 
     if (button == BUTTON_LEFT)
     {
@@ -162,11 +180,18 @@ int main(void)
     }
     vars.img.w = WINDOW_W;
     vars.img.h = WINDOW_H;
-    vars.img.field_x = 0 - FIELD_W / 2;
-    vars.img.field_y = 0 - FIELD_H / 2;
-    vars.img.field_w = FIELD_W;
-    vars.img.field_h = FIELD_H;
     vars.img.addr = mlx_get_data_addr(vars.img.img, &vars.img.bits_per_pixel, &vars.img.line_length, &vars.img.endian);
+
+    vars.img2.img = mlx_new_image(vars.mlx, MINIWINDOW_W, MINIWINDOW_H);
+    vars.img2.w = MINIWINDOW_W;
+    vars.img2.h = MINIWINDOW_H;
+    vars.img2.addr = mlx_get_data_addr(vars.img2.img, &vars.img2.bits_per_pixel, &vars.img2.line_length, &vars.img2.endian);
+    memset(vars.img2.addr, 0x80808080, MINIWINDOW_W * MINIWINDOW_H * (vars.img2.bits_per_pixel / 8));
+
+    vars.camera.x = 0 - FIELD_W / 2;
+    vars.camera.y = 0 - FIELD_H / 2;
+    vars.camera.w = FIELD_W;
+    vars.camera.h = FIELD_H;
 
     init_player(&vars.player);
     init_wall();

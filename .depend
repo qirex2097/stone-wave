@@ -1,3 +1,4 @@
-main.o: main.c stone.h
 drawing.o: drawing.c stone.h
+main.o: main.c stone.h
 player.o: player.c stone.h
+wall.o: wall.c stone.h

@@ -15,6 +15,7 @@
 #define SCALE_UP (1L << 6)
 #define SCALE_DOWN (1L << 7)
 #define CENTER (1L << 8)
+#define SHOW_MINIWINDOW (1L << 9)
 #define PI 3.14159265358979323846
 
 #define COLLINEAR 0
@@ -44,8 +45,6 @@ typedef struct
     int line_length;
     int endian;
     int w, h;
-    int field_x, field_y;
-    int field_w, field_h;
 } t_img;
 
 typedef struct
@@ -62,9 +61,17 @@ typedef struct
 
 typedef struct
 {
+    int x, y;
+    int w, h;
+} t_camera;
+
+typedef struct
+{
     void *mlx;
     void *mlx_win;
+    t_camera camera;
     t_img img;
+    t_img img2;
     t_player player;
     t_mouse mouse;
 } t_vars;
@@ -78,8 +85,8 @@ int do_intersect(t_line *line1, t_line *line2);
 int get_intersection(t_line *line0, t_line *line1, t_pos *cross_point);
 void convert_to_screen(t_pos *field, t_pos_s *screen, int x0, int y0, int w, int h);
 void convert_to_field(t_pos_s *screen, t_pos *field, int x0, int y0, int w, int h);
-void draw_line(t_img *data, t_line *line, int color);
-void draw_circle(t_img *img, t_pos *center, int radius, int color);
+void draw_line(t_img *data, t_camera *camera, t_line *line, int color);
+void draw_circle(t_img *img, t_camera *camera, t_pos *center, int radius, int color);
 
 /* player.c */
 int init_player(t_player *player);
@@ -89,6 +96,7 @@ int draw_player(t_vars *vars);
 
 /* wall.c */
 int init_wall();
+int update_wall(t_vars *vars);
 int draw_wall(t_vars *vars);
 t_line *get_wall(int idx);
 

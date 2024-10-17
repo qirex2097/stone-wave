@@ -17,8 +17,14 @@ int draw_wall(t_vars *vars)
 {
     for (int i = 0; i < 4; i++)
     {
-        draw_line(&vars->img, &wall[i], 0x00ff4080);
+        draw_line(&vars->img, &vars->camera, &wall[i], 0x00ff4080);
     }
+    return 0;
+}
+
+int update_wall(t_vars *vars)
+{
+    (void)vars;
     return 0;
 }
 

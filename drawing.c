@@ -177,25 +177,25 @@ void convert_to_field(t_pos_s *screen, t_pos *field, int x0, int y0, int w, int 
     field->y = screen->y * h / WINDOW_H + y0;
 }
 
-void put_pixel(t_img *img, int x, int y, int color)
+void put_pixel(t_img *img, t_camera *field, int x, int y, int color)
 {
     t_pos pos;
     t_pos_s screen;
     pos.x = x;
     pos.y = y;
-    convert_to_screen(&pos, &screen, img->field_x, img->field_y, img->field_w, img->field_h);
+    convert_to_screen(&pos, &screen, field->x, field->y, field->w, field->h);
     my_mlx_pixel_put(img, screen.x, screen.y, color);
 }
 
-void draw_line(t_img *img, t_line *line, int color)
+void draw_line(t_img *img, t_camera *field, t_line *line, int color)
 {
     t_pos_s p0, p1;
-    convert_to_screen(&line->p0, &p0, img->field_x, img->field_y, img->field_w, img->field_h);
-    convert_to_screen(&line->p1, &p1, img->field_x, img->field_y, img->field_w, img->field_h);
+    convert_to_screen(&line->p0, &p0, field->x, field->y, field->w, field->h);
+    convert_to_screen(&line->p1, &p1, field->x, field->y, field->w, field->h);
     my_mlx_draw_line(img, p0.x, p0.y, p1.x, p1.y, color);
 }
 
-void draw_circle(t_img *img, t_pos *center, int radius, int color)
+void draw_circle(t_img *img, t_camera *camera, t_pos *center, int radius, int color)
 {
     int x_center = center->x;
     int y_center = center->y;
@@ -205,14 +205,14 @@ void draw_circle(t_img *img, t_pos *center, int radius, int color)
 
     while (x >= y)
     {
-        put_pixel(img, x_center + x, y_center + y, color);
-        put_pixel(img, x_center - x, y_center + y, color);
-        put_pixel(img, x_center + x, y_center - y, color);
-        put_pixel(img, x_center - x, y_center - y, color);
-        put_pixel(img, x_center + y, y_center + x, color);
-        put_pixel(img, x_center - y, y_center + x, color);
-        put_pixel(img, x_center + y, y_center - x, color);
-        put_pixel(img, x_center - y, y_center - x, color);
+        put_pixel(img, camera, x_center + x, y_center + y, color);
+        put_pixel(img, camera, x_center - x, y_center + y, color);
+        put_pixel(img, camera, x_center + x, y_center - y, color);
+        put_pixel(img, camera, x_center - x, y_center - y, color);
+        put_pixel(img, camera, x_center + y, y_center + x, color);
+        put_pixel(img, camera, x_center - y, y_center + x, color);
+        put_pixel(img, camera, x_center + y, y_center - x, color);
+        put_pixel(img, camera, x_center - y, y_center - x, color);
 
         y++;
 

@@ -5,7 +5,7 @@
 #include "stone.h"
 
 #define SCALE_STEP 8
-#define PLAYER_RADIUS 20
+#define PLAYER_RADIUS 10
 #define LINE_LENGTH 100
 #define PLAYER_COLOR 0x00ff0000
 #define TEXT_COLOR 0x00ffffff
@@ -39,6 +39,7 @@ int update_player(t_vars *vars)
     t_player *player = &vars->player;
     t_mouse *mouse = &vars->mouse;
     t_img *img = &vars->img;
+    t_camera *camera = &vars->camera;
     int dx, dy, dangle;
 
     dx = dy = 5;
@@ -58,27 +59,27 @@ int update_player(t_vars *vars)
         player->x += dx;
     if (mouse->button & SCALE_UP)
     {
-        img->field_h -= SCALE_STEP;
-        img->field_w -= SCALE_STEP;
-        img->field_x += SCALE_STEP / 2;
-        img->field_y += SCALE_STEP / 2;
+        camera->h -= SCALE_STEP;
+        camera->w -= SCALE_STEP;
+        camera->x += SCALE_STEP / 2;
+        camera->y += SCALE_STEP / 2;
         mouse->button &= ~(SCALE_UP);
     }
     if (mouse->button & SCALE_DOWN)
     {
-        img->field_h += SCALE_STEP;
-        img->field_w += SCALE_STEP;
-        img->field_x -= SCALE_STEP / 2;
-        img->field_y -= SCALE_STEP / 2;
+        camera->h += SCALE_STEP;
+        camera->w += SCALE_STEP;
+        camera->x -= SCALE_STEP / 2;
+        camera->y -= SCALE_STEP / 2;
         mouse->button &= ~(SCALE_DOWN);
     }
     if (mouse->button & CENTER)
     {
         t_pos pos;
-        convert_to_field(&mouse->pos, &pos, img->field_x, img->field_y, img->field_w, img->field_h);
-        img->field_x = pos.x - img->field_w / 2;
-        img->field_y = pos.y - img->field_h / 2;
-        // printf("(%d,%d)\n", img->field_x, img->field_y);
+        convert_to_field(&mouse->pos, &pos, camera->x, camera->y, camera->w, camera->h);
+        camera->x = pos.x - camera->w / 2;
+        camera->y = pos.y - camera->h / 2;
+        // printf("(%d,%d)\n", field->x, field->y);
         mouse->button &= ~(CENTER);
     }
 
@@ -93,7 +94,7 @@ int draw_player_lines(t_vars *vars)
     way.p0.x = player->x;
     way.p0.y = player->y;
     int radius = PLAYER_RADIUS;
-    draw_circle(&vars->img, &way.p0, radius, PLAYER_COLOR);
+    draw_circle(&vars->img, &vars->camera, &way.p0, radius, PLAYER_COLOR);
 
     int line_length = LINE_LENGTH;
     int i = 0;
@@ -104,7 +105,7 @@ int draw_player_lines(t_vars *vars)
         double radian = (player->angle + (i - 3) * 10) * PI / 180.0;
         way.p1.x = player->x + (int)(line_length * cos(radian));
         way.p1.y = player->y + (int)(line_length * sin(radian));
-        draw_line(&vars->img, &way, color);
+        draw_line(&vars->img, &vars->camera, &way, color);
 
         int j = 0;
         t_line *wall;
@@ -113,7 +114,7 @@ int draw_player_lines(t_vars *vars)
             if (do_intersect(wall, &way) && get_intersection(wall, &way, &cross_point))
             {
                 color = 0x00ff0000;
-                draw_circle(&vars->img, &cross_point, 10, color);
+                draw_circle(&vars->img, &vars->camera, &cross_point, 3, color);
             }
             j++;
         }
