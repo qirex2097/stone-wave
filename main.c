@@ -5,32 +5,6 @@
 #include <X11/X.h>
 #include "stone.h"
 
-#define BUTTON_LEFT 1
-#define BUTTON_RIGHT 3
-#define BUTTON_UP 4
-#define BUTTON_DOWN 5
-#define KEY_ESC 65307
-#define KEY_PGUP 65365
-#define KEY_PGDN 65366
-#define KEY_LEFT 65361
-#define KEY_UP 65362
-#define KEY_RIGHT 65363
-#define KEY_DOWN 65364
-
-#define KEY_A 97
-#define KEY_S 115
-#define KEY_D 100
-#define KEY_W 119
-#define KEY_H 104
-#define KEY_J 106
-#define KEY_K 107
-#define KEY_L 108
-
-#define MINIWINDOW_W 160
-#define MINIWINDOW_H 120
-
-void cleanup(t_vars *vars);
-
 int render_next_frame(void *param)
 {
     t_vars *vars = (t_vars *)param;
@@ -46,91 +20,8 @@ int render_next_frame(void *param)
     draw_wall(vars);
 
     if (vars->mouse.button & SHOW_MINIWINDOW)
-        mlx_put_image_to_window(vars->mlx, vars->mlx_win, vars->img2.img, 0, 0);
-    memset(vars->img2.addr, 0xc0808080, MINIWINDOW_W * MINIWINDOW_H * (vars->img2.bits_per_pixel / 8));
-
-    return 0;
-}
-
-int key_press_handler(int keycode, void *param)
-{
-    t_vars *vars = param;
-    t_mouse *mouse = &vars->mouse;
-
-    // printf("press:%d\n", keycode);
-
-    if (keycode == KEY_LEFT)
-        mouse->button |= TURN_LEFT;
-    if (keycode == KEY_RIGHT)
-        mouse->button |= TURN_RIGHT;
-    if (keycode == KEY_W)
-        mouse->button |= MOVE_UP;
-    if (keycode == KEY_S)
-        mouse->button |= MOVE_DOWN;
-    if (keycode == KEY_A)
-        mouse->button |= MOVE_LEFT;
-    if (keycode == KEY_D)
-        mouse->button |= MOVE_RIGHT;
-
-    return 0;
-}
-
-int key_release_handler(int keycode, void *param)
-{
-    t_vars *vars = param;
-    t_mouse *mouse = &vars->mouse;
-
-    // printf("release:%d\n", keycode);
-    if (keycode == KEY_ESC)
     {
-        cleanup(vars);
-        exit(0);
-    }
-
-    if (keycode == KEY_LEFT)
-        mouse->button &= ~(TURN_LEFT);
-    if (keycode == KEY_RIGHT)
-        mouse->button &= ~(TURN_RIGHT);
-    if (keycode == KEY_W)
-        mouse->button &= ~(MOVE_UP);
-    if (keycode == KEY_S)
-        mouse->button &= ~(MOVE_DOWN);
-    if (keycode == KEY_A)
-        mouse->button &= ~(MOVE_LEFT);
-    if (keycode == KEY_D)
-        mouse->button &= ~(MOVE_RIGHT);
-
-    return 0;
-}
-
-int mouse_down_handler(int button, int x, int y, void *param)
-{
-    t_vars *vars = param;
-    t_mouse *mouse = &vars->mouse;
-
-    switch (button)
-    {
-    case BUTTON_RIGHT:
-        if (mouse->button & SHOW_MINIWINDOW)
-            mouse->button &= ~(SHOW_MINIWINDOW);
-        else
-            mouse->button |= SHOW_MINIWINDOW;
-        break;
-    }
-
-    if (button == BUTTON_LEFT)
-    {
-        mouse->pos.x = x;
-        mouse->pos.y = y;
-        mouse->button |= CENTER;
-    }
-    if (button == BUTTON_UP)
-    {
-        mouse->button |= SCALE_UP;
-    }
-    if (button == BUTTON_DOWN)
-    {
-        mouse->button |= SCALE_DOWN;
+        render_mini_window(vars);
     }
 
     return 0;
@@ -138,9 +29,14 @@ int mouse_down_handler(int button, int x, int y, void *param)
 
 void cleanup(t_vars *vars)
 {
-    mlx_destroy_image(vars->mlx, vars->img.img);
-    mlx_destroy_window(vars->mlx, vars->mlx_win);
-    mlx_destroy_display(vars->mlx);
+    if (vars->img2.img)
+        mlx_destroy_image(vars->mlx, vars->img2.img);
+    if (vars->img.img)
+        mlx_destroy_image(vars->mlx, vars->img.img);
+    if (vars->mlx_win)
+        mlx_destroy_window(vars->mlx, vars->mlx_win);
+    if (vars->mlx)
+        mlx_destroy_display(vars->mlx);
     free(vars->mlx);
 }
 
@@ -151,47 +47,57 @@ int cross_button_handler(void *param)
     exit(0);
 }
 
+int initialize_mlx(t_vars *vars)
+{
+    vars->mlx = NULL;
+    vars->mlx_win = NULL;
+    vars->img.img = NULL;
+    vars->img2.img = NULL;
+
+    vars->mlx = mlx_init();
+    if (vars->mlx == NULL)
+    {
+        perror("Unable to initialize mlx");
+        return -1;
+    }
+    vars->mlx_win = mlx_new_window(vars->mlx, WINDOW_W, WINDOW_H, "Press ESC to exit");
+    if (vars->mlx_win == NULL)
+    {
+        perror("Unable to initialize mlx_win");
+        return -1;
+    }
+    vars->img.img = mlx_new_image(vars->mlx, WINDOW_W, WINDOW_H);
+    if (vars->img.img == NULL)
+    {
+        perror("Unable to initialize image");
+        return -1;
+    }
+    vars->img.w = WINDOW_W;
+    vars->img.h = WINDOW_H;
+    vars->img.addr = mlx_get_data_addr(vars->img.img, &vars->img.bits_per_pixel, &vars->img.line_length, &vars->img.endian);
+
+    vars->camera.x = 0 - FIELD_W / 2;
+    vars->camera.y = 0 - FIELD_H / 2;
+    vars->camera.w = FIELD_W;
+    vars->camera.h = FIELD_H;
+
+    if (init_mini_window(vars) != 0)
+    {
+        perror("Unable to initialize mini window");
+        return -1;
+    }
+    return 0;
+}
+
 int main(void)
 {
     t_vars vars;
 
-    vars.mlx = mlx_init();
-    if (vars.mlx == NULL)
+    if (initialize_mlx(&vars) != 0)
     {
-        perror("Unable to initialize mlx");
+        cleanup(&vars);
         exit(1);
     }
-    vars.mlx_win = mlx_new_window(vars.mlx, WINDOW_W, WINDOW_H, "Press ESC to exit");
-    if (vars.mlx_win == NULL)
-    {
-        perror("Unable to initialize mlx_win");
-        mlx_destroy_display(vars.mlx);
-        free(vars.mlx);
-        exit(1);
-    }
-    vars.img.img = mlx_new_image(vars.mlx, WINDOW_W, WINDOW_H);
-    if (vars.img.img == NULL)
-    {
-        perror("Unable to initialize image");
-        mlx_destroy_window(vars.mlx, vars.mlx_win);
-        mlx_destroy_display(vars.mlx);
-        free(vars.mlx);
-        exit(1);
-    }
-    vars.img.w = WINDOW_W;
-    vars.img.h = WINDOW_H;
-    vars.img.addr = mlx_get_data_addr(vars.img.img, &vars.img.bits_per_pixel, &vars.img.line_length, &vars.img.endian);
-
-    vars.img2.img = mlx_new_image(vars.mlx, MINIWINDOW_W, MINIWINDOW_H);
-    vars.img2.w = MINIWINDOW_W;
-    vars.img2.h = MINIWINDOW_H;
-    vars.img2.addr = mlx_get_data_addr(vars.img2.img, &vars.img2.bits_per_pixel, &vars.img2.line_length, &vars.img2.endian);
-    memset(vars.img2.addr, 0x80808080, MINIWINDOW_W * MINIWINDOW_H * (vars.img2.bits_per_pixel / 8));
-
-    vars.camera.x = 0 - FIELD_W / 2;
-    vars.camera.y = 0 - FIELD_H / 2;
-    vars.camera.w = FIELD_W;
-    vars.camera.h = FIELD_H;
 
     init_player(&vars.player);
     init_wall();

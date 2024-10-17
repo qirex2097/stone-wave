@@ -22,6 +22,27 @@
 #define CLOCKWISE 1
 #define COUNTERCLOCKWISE 2
 
+#define BUTTON_LEFT 1
+#define BUTTON_RIGHT 3
+#define BUTTON_UP 4
+#define BUTTON_DOWN 5
+#define KEY_ESC 65307
+#define KEY_PGUP 65365
+#define KEY_PGDN 65366
+#define KEY_LEFT 65361
+#define KEY_UP 65362
+#define KEY_RIGHT 65363
+#define KEY_DOWN 65364
+
+#define KEY_A 97
+#define KEY_S 115
+#define KEY_D 100
+#define KEY_W 119
+#define KEY_H 104
+#define KEY_J 106
+#define KEY_K 107
+#define KEY_L 108
+
 typedef struct
 {
     int x, y;
@@ -74,7 +95,11 @@ typedef struct
     t_img img2;
     t_player player;
     t_mouse mouse;
+    int mini_x, mini_y;
 } t_vars;
+
+/* main.c */
+void cleanup(t_vars *vars);
 
 /* drawing.c */
 void my_mlx_pixel_put(t_img *data, int x, int y, int color);
@@ -99,5 +124,15 @@ int init_wall();
 int update_wall(t_vars *vars);
 int draw_wall(t_vars *vars);
 t_line *get_wall(int idx);
+
+/* key_hendler.c */
+int key_press_handler(int keycode, void *param);
+int key_press_handler(int keycode, void *param);
+int key_release_handler(int keycode, void *param);
+int mouse_down_handler(int button, int x, int y, void *param);
+
+/* mini_window.c */
+int init_mini_window(t_vars *vars);
+int render_mini_window(t_vars *vars);
 
 #endif //_STONE_H_
