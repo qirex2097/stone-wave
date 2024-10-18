@@ -1,11 +1,11 @@
 #include <stdlib.h>
 #include "stone.h"
 
-static t_line wall[] = {
-    {{-50, -50}, {-50, 50}},
-    {{-50, 50}, {50, 50}},
-    {{50, 50}, {50, -50}},
-    {{50, -50}, {-50, -50}},
+static t_wall wall[] = {
+    {{{-50, -50}, {-50, 50}}, 0x00ff0000},
+    {{{-50, 50}, {50, 50}}, 0x0000ff00},
+    {{{50, 50}, {50, -50}}, 0x000000ff},
+    {{{50, -50}, {-50, -50}}, 0x00ff8000},
 };
 
 int init_wall()
@@ -17,7 +17,7 @@ int draw_wall(t_vars *vars)
 {
     for (int i = 0; i < 4; i++)
     {
-        draw_line(&vars->img, &vars->camera, &wall[i], 0x00ff4080);
+        draw_line(&vars->img, &vars->camera, &wall[i].line, 0x00ff4080);
     }
     return 0;
 }
@@ -28,7 +28,7 @@ int update_wall(t_vars *vars)
     return 0;
 }
 
-t_line *get_wall(int idx)
+t_wall *get_wall(int idx)
 {
     if (idx < 0 || sizeof(wall) / sizeof(t_line) <= idx)
         return NULL;

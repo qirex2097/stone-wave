@@ -75,6 +75,12 @@ typedef struct
 
 typedef struct
 {
+    t_line line;
+    int color;
+} t_wall;
+
+typedef struct
+{
     t_pos_s pos;
     uint64_t button;
 } t_mouse;
@@ -123,7 +129,7 @@ int draw_player(t_vars *vars);
 int init_wall();
 int update_wall(t_vars *vars);
 int draw_wall(t_vars *vars);
-t_line *get_wall(int idx);
+t_wall *get_wall(int idx);
 
 /* key_hendler.c */
 int key_press_handler(int keycode, void *param);

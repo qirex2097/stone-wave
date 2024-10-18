@@ -93,12 +93,12 @@ void draw_player_view_line(t_vars *vars)
         draw_line(&vars->img, &vars->camera, &way, color);
 
         int j = 0;
-        t_line *wall;
+        t_wall *wall;
         while (wall = get_wall(j))
         {
-            if (do_intersect(wall, &way) && get_intersection(wall, &way, &cross_point))
+            if (do_intersect(&wall->line, &way) && get_intersection(&wall->line, &way, &cross_point))
             {
-                color = 0x00ff0000;
+                color = wall->color;
                 draw_circle(&vars->img, &vars->camera, &cross_point, 3, color);
                 // ミニウィンドウにラインを描画
                 // TODO 距離に応じてラインの長さを変える
