@@ -76,7 +76,7 @@ typedef struct
 typedef struct
 {
     t_pos_s pos;
-    uint32_t button;
+    uint64_t button;
 } t_mouse;
 
 typedef struct

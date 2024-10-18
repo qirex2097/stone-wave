@@ -5,7 +5,7 @@
 #include "stone.h"
 
 #define PLAYER_RADIUS 10
-#define LINE_LENGTH 100
+#define VIEW_LENGTH 300
 #define PLAYER_COLOR 0x00ff0000
 #define TEXT_COLOR 0x00ffffff
 
@@ -71,17 +71,15 @@ int update_player(t_vars *vars)
     return 0;
 }
 
-int draw_player_lines(t_vars *vars)
+void draw_player_view_line(t_vars *vars)
 {
     t_player *player = &vars->player;
     t_line way;
 
     way.p0.x = player->x;
     way.p0.y = player->y;
-    int radius = PLAYER_RADIUS;
-    draw_circle(&vars->img, &vars->camera, &way.p0, radius, PLAYER_COLOR);
 
-    int line_length = LINE_LENGTH;
+    int line_length = VIEW_LENGTH;
     int i = 0;
     int kazu = 15;
     int kakudo = 7;
@@ -106,10 +104,9 @@ int draw_player_lines(t_vars *vars)
                 // TODO 距離に応じてラインの長さを変える
                 double theta = (i - kazu / 2) * kakudo * PI / 180.0;
                 double distance = sqrt(distance_squared(way.p0.x, way.p0.y, cross_point.x, cross_point.y)) * cos(theta);
-                int line_length = (int)2800 / distance;
-                my_mlx_draw_line(&vars->img2,
-                                 vars->img2.w / 2 + (i - kazu / 2) * 10, 60 - line_length / 2,
-                                 vars->img2.w / 2 + (i - kazu / 2) * 10, 60 + line_length / 2, 0x00ff0000);
+                int line_length = (int)(2800 / distance);
+                int x = vars->img2.w / 2 + (i - kazu / 2) * 10;
+                my_mlx_draw_line(&vars->img2, x, 60 - line_length / 2, x, 60 + line_length / 2, color);
             }
             j++;
         }
@@ -117,7 +114,19 @@ int draw_player_lines(t_vars *vars)
     }
 }
 
-int render_player_info(t_vars *vars)
+void draw_player_lines(t_vars *vars)
+{
+    t_player *player = &vars->player;
+    t_line way;
+
+    way.p0.x = player->x;
+    way.p0.y = player->y;
+    int radius = PLAYER_RADIUS;
+    draw_circle(&vars->img, &vars->camera, &way.p0, radius, PLAYER_COLOR);
+    draw_player_view_line(vars);
+}
+
+void render_player_info(t_vars *vars)
 {
     t_player *player = &vars->player;
 
