@@ -4,7 +4,7 @@
 #include <math.h>
 #include "stone.h"
 
-#define SCALE_STEP 8
+#define SCALE_STEP 50
 #define PLAYER_RADIUS 10
 #define LINE_LENGTH 100
 #define PLAYER_COLOR 0x00ff0000
@@ -76,7 +76,7 @@ int update_player(t_vars *vars)
     if (mouse->button & CENTER)
     {
         t_pos pos;
-        convert_to_field(&mouse->pos, &pos, camera->x, camera->y, camera->w, camera->h);
+        convert_to_field(&mouse->pos, &pos, img, camera);
         camera->x = pos.x - camera->w / 2;
         camera->y = pos.y - camera->h / 2;
         // printf("(%d,%d)\n", field->x, field->y);

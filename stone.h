@@ -108,8 +108,8 @@ void draw_line_s(t_img *data, t_line *line, int color);
 void draw_circle_s(t_img *img, t_pos *center, int radius, int color);
 int do_intersect(t_line *line1, t_line *line2);
 int get_intersection(t_line *line0, t_line *line1, t_pos *cross_point);
-void convert_to_screen(t_pos *field, t_pos_s *screen, int x0, int y0, int w, int h);
-void convert_to_field(t_pos_s *screen, t_pos *field, int x0, int y0, int w, int h);
+void convert_to_screen(t_pos *field, t_pos_s *screen, t_img *img, t_camera *camera);
+void convert_to_field(t_pos_s *screen, t_pos *field, t_img *img, t_camera *camera);
 void draw_line(t_img *data, t_camera *camera, t_line *line, int color);
 void draw_circle(t_img *img, t_camera *camera, t_pos *center, int radius, int color);
 

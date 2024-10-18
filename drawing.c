@@ -1,4 +1,5 @@
 #include <mlx.h>
+#include <stdlib.h>
 #include "stone.h"
 
 int is_out_of_bounds(int x, int y, int w, int h)
@@ -163,18 +164,20 @@ int get_intersection(t_line *line0, t_line *line1, t_pos *cross_point)
     return 1;
 }
 
-void convert_to_screen(t_pos *field, t_pos_s *screen, int x0, int y0, int w, int h)
+void convert_to_screen(t_pos *field, t_pos_s *screen, t_img *img, t_camera *camera)
 {
-    if (w == 0 || h == 0)
+    if (img == NULL || camera == NULL || camera->w == 0 || camera->h == 0)
         return;
-    screen->x = (field->x - x0) * WINDOW_W / w;
-    screen->y = (field->y - y0) * WINDOW_H / h;
+    screen->x = (field->x - camera->x) * img->w / camera->w;
+    screen->y = (field->y - camera->y) * img->h / camera->h;
 }
 
-void convert_to_field(t_pos_s *screen, t_pos *field, int x0, int y0, int w, int h)
+void convert_to_field(t_pos_s *screen, t_pos *field, t_img *img, t_camera *camera)
 {
-    field->x = screen->x * w / WINDOW_W + x0;
-    field->y = screen->y * h / WINDOW_H + y0;
+    if (camera == NULL || img == NULL || img->w == 0 || img->h == 0)
+        return;
+    field->x = screen->x * camera->w / img->w + camera->x;
+    field->y = screen->y * camera->h / img->h + camera->y;
 }
 
 void put_pixel(t_img *img, t_camera *field, int x, int y, int color)
@@ -183,15 +186,15 @@ void put_pixel(t_img *img, t_camera *field, int x, int y, int color)
     t_pos_s screen;
     pos.x = x;
     pos.y = y;
-    convert_to_screen(&pos, &screen, field->x, field->y, field->w, field->h);
+    convert_to_screen(&pos, &screen, img, field);
     my_mlx_pixel_put(img, screen.x, screen.y, color);
 }
 
 void draw_line(t_img *img, t_camera *field, t_line *line, int color)
 {
     t_pos_s p0, p1;
-    convert_to_screen(&line->p0, &p0, field->x, field->y, field->w, field->h);
-    convert_to_screen(&line->p1, &p1, field->x, field->y, field->w, field->h);
+    convert_to_screen(&line->p0, &p0, img, field);
+    convert_to_screen(&line->p1, &p1, img, field);
     my_mlx_draw_line(img, p0.x, p0.y, p1.x, p1.y, color);
 }
 

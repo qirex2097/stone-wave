@@ -7,6 +7,9 @@
 
 int init_mini_window(t_vars *vars)
 {
+    if (vars == NULL || vars->mlx == NULL)
+        return -1;
+
     vars->img2.img = mlx_new_image(vars->mlx, MINIWINDOW_W, MINIWINDOW_H);
     if (vars->img2.img == NULL)
         return -1;
