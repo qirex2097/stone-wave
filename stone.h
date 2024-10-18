@@ -114,6 +114,7 @@ void convert_to_screen(t_pos *field, t_pos_s *screen, t_img *img, t_camera *came
 void convert_to_field(t_pos_s *screen, t_pos *field, t_img *img, t_camera *camera);
 void draw_line(t_img *data, t_camera *camera, t_line *line, int color);
 void draw_circle(t_img *img, t_camera *camera, t_pos *center, int radius, int color);
+long long distance_squared(int x1, int y1, int x2, int y2);
 
 /* player.c */
 int init_player(t_player *player);

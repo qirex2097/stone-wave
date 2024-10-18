@@ -230,3 +230,11 @@ void draw_circle(t_img *img, t_camera *camera, t_pos *center, int radius, int co
         }
     }
 }
+
+// 2点間の距離の平方を計算する関数
+long long distance_squared(int x1, int y1, int x2, int y2)
+{
+    long long dx = x2 - x1;
+    long long dy = y2 - y1;
+    return dx * dx + dy * dy;
+}

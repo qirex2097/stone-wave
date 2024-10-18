@@ -83,11 +83,13 @@ int draw_player_lines(t_vars *vars)
 
     int line_length = LINE_LENGTH;
     int i = 0;
-    while (i < 7)
+    int kazu = 15;
+    int kakudo = 7;
+    while (i < kazu)
     {
         t_pos cross_point;
         int color = 0x0000ff00;
-        double radian = (player->angle + (i - 3) * 10) * PI / 180.0;
+        double radian = (player->angle + (i - kazu / 2) * kakudo) * PI / 180.0;
         way.p1.x = player->x + (int)(line_length * cos(radian));
         way.p1.y = player->y + (int)(line_length * sin(radian));
         draw_line(&vars->img, &vars->camera, &way, color);
@@ -100,6 +102,14 @@ int draw_player_lines(t_vars *vars)
             {
                 color = 0x00ff0000;
                 draw_circle(&vars->img, &vars->camera, &cross_point, 3, color);
+                // ミニウィンドウにラインを描画
+                // TODO 距離に応じてラインの長さを変える
+                double theta = (i - kazu / 2) * kakudo * PI / 180.0;
+                double distance = sqrt(distance_squared(way.p0.x, way.p0.y, cross_point.x, cross_point.y)) * cos(theta);
+                int line_length = (int)2800 / distance;
+                my_mlx_draw_line(&vars->img2,
+                                 vars->img2.w / 2 + (i - kazu / 2) * 10, 60 - line_length / 2,
+                                 vars->img2.w / 2 + (i - kazu / 2) * 10, 60 + line_length / 2, 0x00ff0000);
             }
             j++;
         }
