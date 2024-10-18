@@ -2,6 +2,13 @@
 #include <stdlib.h>
 #include "stone.h"
 
+typedef enum
+{
+    COLLINEAR = 0,
+    CLOCKWISE,
+    COUNTERCLOCKWISE,
+} Orientation;
+
 int is_out_of_bounds(int x, int y, int w, int h)
 {
     return (x < 0 || w <= x || y < 0 || h <= y);

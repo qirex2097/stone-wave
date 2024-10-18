@@ -1,5 +1,6 @@
 #ifndef _STONE_H_
 #define _STONE_H_
+#include <stdint.h>
 
 #define FIELD_W 1000
 #define FIELD_H 1000
@@ -19,10 +20,6 @@
 #define MOVE_FORWARD (1L << 10)
 #define MOVE_BACKWARD (1L << 11)
 #define PI 3.14159265358979323846
-
-#define COLLINEAR 0
-#define CLOCKWISE 1
-#define COUNTERCLOCKWISE 2
 
 #define BUTTON_LEFT 1
 #define BUTTON_RIGHT 3
@@ -79,7 +76,7 @@ typedef struct
 typedef struct
 {
     t_pos_s pos;
-    unsigned long button;
+    uint32_t button;
 } t_mouse;
 
 typedef struct
@@ -129,7 +126,6 @@ int draw_wall(t_vars *vars);
 t_line *get_wall(int idx);
 
 /* key_hendler.c */
-int key_press_handler(int keycode, void *param);
 int key_press_handler(int keycode, void *param);
 int key_release_handler(int keycode, void *param);
 int mouse_down_handler(int button, int x, int y, void *param);
