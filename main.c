@@ -12,6 +12,7 @@ int render_next_frame(void *param)
 
     mlx_put_image_to_window(vars->mlx, vars->mlx_win, img->img, 0, 0);
 
+    update_camera(vars);
     update_player(vars);
     update_wall(vars);
 
@@ -76,11 +77,6 @@ int initialize_mlx(t_vars *vars)
     vars->img.h = WINDOW_H;
     vars->img.addr = mlx_get_data_addr(vars->img.img, &vars->img.bits_per_pixel, &vars->img.line_length, &vars->img.endian);
 
-    vars->camera.x = 0 - FIELD_W / 2;
-    vars->camera.y = 0 - FIELD_H / 2;
-    vars->camera.w = FIELD_W;
-    vars->camera.h = FIELD_H;
-
     if (init_mini_window(vars) != 0)
     {
         perror("Unable to initialize mini window");
@@ -99,6 +95,7 @@ int main(void)
         exit(1);
     }
 
+    init_camera(&vars.camera, 0 - FIELD_W / 2, 0 - FIELD_H / 2, FIELD_W, FIELD_H);
     init_player(&vars.player);
     init_wall();
     init_mouse(&vars.mouse);

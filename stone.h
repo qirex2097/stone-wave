@@ -16,6 +16,8 @@
 #define SCALE_DOWN (1L << 7)
 #define CENTER (1L << 8)
 #define SHOW_MINIWINDOW (1L << 9)
+#define MOVE_FORWARD (1L << 10)
+#define MOVE_BACKWARD (1L << 11)
 #define PI 3.14159265358979323846
 
 #define COLLINEAR 0
@@ -130,6 +132,10 @@ int key_press_handler(int keycode, void *param);
 int key_press_handler(int keycode, void *param);
 int key_release_handler(int keycode, void *param);
 int mouse_down_handler(int button, int x, int y, void *param);
+
+/* camera.c */
+void init_camera(t_camera *camera, int x, int y, int w, int h);
+int update_camera(t_vars *vars);
 
 /* mini_window.c */
 int init_mini_window(t_vars *vars);

@@ -4,7 +4,6 @@
 #include <math.h>
 #include "stone.h"
 
-#define SCALE_STEP 50
 #define PLAYER_RADIUS 10
 #define LINE_LENGTH 100
 #define PLAYER_COLOR 0x00ff0000
@@ -41,6 +40,7 @@ int update_player(t_vars *vars)
     t_img *img = &vars->img;
     t_camera *camera = &vars->camera;
     int dx, dy, dangle;
+    double radian = (player->angle) * PI / 180.0;
 
     dx = dy = 5;
     dangle = 1;
@@ -57,30 +57,15 @@ int update_player(t_vars *vars)
         player->x -= dx;
     if (mouse->button & MOVE_RIGHT)
         player->x += dx;
-    if (mouse->button & SCALE_UP)
+    if (mouse->button & MOVE_FORWARD)
     {
-        camera->h -= SCALE_STEP;
-        camera->w -= SCALE_STEP;
-        camera->x += SCALE_STEP / 2;
-        camera->y += SCALE_STEP / 2;
-        mouse->button &= ~(SCALE_UP);
+        player->x += (int)(dx * cos(radian));
+        player->y += (int)(dx * sin(radian));
     }
-    if (mouse->button & SCALE_DOWN)
+    if (mouse->button & MOVE_BACKWARD)
     {
-        camera->h += SCALE_STEP;
-        camera->w += SCALE_STEP;
-        camera->x -= SCALE_STEP / 2;
-        camera->y -= SCALE_STEP / 2;
-        mouse->button &= ~(SCALE_DOWN);
-    }
-    if (mouse->button & CENTER)
-    {
-        t_pos pos;
-        convert_to_field(&mouse->pos, &pos, img, camera);
-        camera->x = pos.x - camera->w / 2;
-        camera->y = pos.y - camera->h / 2;
-        // printf("(%d,%d)\n", field->x, field->y);
-        mouse->button &= ~(CENTER);
+        player->x -= (int)(dx * cos(radian));
+        player->y -= (int)(dx * sin(radian));
     }
 
     return 0;

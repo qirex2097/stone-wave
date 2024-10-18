@@ -8,6 +8,10 @@ int key_press_handler(int keycode, void *param)
 
     // printf("press:%d\n", keycode);
 
+    if (keycode == KEY_UP)
+        mouse->button |= MOVE_FORWARD;
+    if (keycode == KEY_DOWN)
+        mouse->button |= MOVE_BACKWARD;
     if (keycode == KEY_LEFT)
         mouse->button |= TURN_LEFT;
     if (keycode == KEY_RIGHT)
@@ -35,7 +39,10 @@ int key_release_handler(int keycode, void *param)
         cleanup(vars);
         exit(0);
     }
-
+    if (keycode == KEY_UP)
+        mouse->button &= ~(MOVE_FORWARD);
+    if (keycode == KEY_DOWN)
+        mouse->button &= ~(MOVE_BACKWARD);
     if (keycode == KEY_LEFT)
         mouse->button &= ~(TURN_LEFT);
     if (keycode == KEY_RIGHT)
