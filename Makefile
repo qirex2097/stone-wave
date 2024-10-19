@@ -4,13 +4,13 @@ CC = gcc
 # コンパイルオプションの指定
 MLX_DIR = minilibx-linux
 CFLAGS = -I$(MLX_DIR) -g
-LDFLAGS = -L$(MLX_DIR) -lmlx -lX11 -lXext
+LDFLAGS = -L$(MLX_DIR) -lm -lmlx -lX11 -lXext
 
 # 実行ファイル名
 TARGET = stone
 
 # ソースファイル
-SRCS = main.c
+SRCS = $(wildcard *.c)
 
 # オブジェクトファイルの指定（.c -> .o に変換）
 OBJS = $(SRCS:.c=.o)
