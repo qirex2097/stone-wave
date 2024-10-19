@@ -36,3 +36,18 @@ depend: $(SRCS)
 
 # ディペンデンシファイルのインクルード
 -include .depend
+
+CXX = g++
+CXXFLAGS = -I./googletest -I./googletest/include -pthread
+TEST_SRC = tests/my_tests.cpp
+TEST_TARGET_SRCS = drawing.c
+TEST_TARGET = run_tests
+TEST_OBJ = $(TEST_TARGET_SRCS:.c=.o) $(TEST_SRC:.cpp=.o) googletest/src/gtest-all.o googletest/src/gtest_main.o
+
+tests: $(TEST_TARGET)
+	./$(TEST_TARGET)
+
+$(TEST_TARGET): $(TEST_OBJ) $(OBJS)
+	$(CXX) $(TEST_OBJ) -o $(TEST_TARGET)
+
+.PHONY: tests
