@@ -112,7 +112,7 @@ void draw_miniwindow(t_vars *vars, t_wall *wall, t_line *way, int sx)
         int color = wall->color;
         draw_circle(&vars->img, &vars->camera, &cross_point, 3, color);
         // ミニウィンドウにラインを描画
-        double cos_theta = cosine_angle(player->x, player->y, player_ray_x, player_ray_y, cross_point.x, cross_point.y);
+        double cos_theta = cosine_angle(player_ray_x, player_ray_y, player->x, player->y, cross_point.x, cross_point.y);
         double distance = sqrt(distance_squared(way->p0.x, way->p0.y, cross_point.x, cross_point.y)) * cos_theta;
         int line_length = (int)(2800 / distance);
         my_mlx_draw_line(&vars->img2, sx, 60 - line_length / 2, sx, 60 + line_length / 2, color);
@@ -124,29 +124,32 @@ void draw_player_view_line(t_vars *vars)
     t_player *player = &vars->player;
     t_line way, player_ray;
 
-    int line_length = VIEW_LENGTH;
-    int i = 0;
-    int kazu = 29;
-    int kakudo = 3;
-    while (i < kazu)
+    t_line screen_line;
+
+    double radian = (player->angle * PI) / 180.0;
+    screen_line.p0.x = player->x + VIEW_LENGTH * cos(radian - PI / 4.0);
+    screen_line.p0.y = player->x + VIEW_LENGTH * sin(radian - PI / 4.0);
+    screen_line.p1.x = player->x + VIEW_LENGTH * cos(radian + PI / 4.0);
+    screen_line.p1.y = player->x + VIEW_LENGTH * sin(radian + PI / 4.0);
+    draw_line(&vars->img, &vars->camera, &screen_line, 0x00ffffff);
+
+    int sx = 0;
+    while (sx < vars->img2.w)
     {
-        int color = 0x0000ff00;
-        double radian = (player->angle + (i - kazu / 2) * kakudo) * PI / 180.0;
-        way.p0.x = player->x;
-        way.p0.y = player->y;
-        way.p1.x = player->x + (int)(line_length * cos(radian));
-        way.p1.y = player->y + (int)(line_length * sin(radian));
-        draw_line(&vars->img, &vars->camera, &way, color);
+        t_line ray;
+        ray.p0.x = player->x;
+        ray.p0.y = player->y;
+        map_point_on_line(&screen_line, vars->img2.w, sx, &ray.p1);
 
         int j = 0;
         t_wall *wall;
         while (wall = get_wall(j))
         {
-            int x = vars->img2.w / 2 + (i - kazu / 2) * 10;
-            draw_miniwindow(vars, wall, &way, x);
+            draw_miniwindow(vars, wall, &ray, sx);
             j++;
         }
-        i++;
+
+        sx++;
     }
 }
 
