@@ -98,14 +98,31 @@ int find_intersection_point(t_vars *vars, t_line *line, t_pos *cross_point, int 
     return flg;
 }
 
-void draw_player_view_line(t_vars *vars)
+void draw_miniwindow(t_vars *vars, t_wall *wall, t_line *way, int sx)
 {
     t_player *player = &vars->player;
-    t_line way, player_ray;
+    t_pos cross_point;
 
     double radian = (player->angle * PI) / 180.0;
     int player_ray_x = player->x + (int)(VIEW_LENGTH * cos(radian));
     int player_ray_y = player->y + (int)(VIEW_LENGTH * sin(radian));
+
+    if (do_intersect(&wall->line, way) && get_intersection(&wall->line, way, &cross_point))
+    {
+        int color = wall->color;
+        draw_circle(&vars->img, &vars->camera, &cross_point, 3, color);
+        // ミニウィンドウにラインを描画
+        double cos_theta = cosine_angle(player->x, player->y, player_ray_x, player_ray_y, cross_point.x, cross_point.y);
+        double distance = sqrt(distance_squared(way->p0.x, way->p0.y, cross_point.x, cross_point.y)) * cos_theta;
+        int line_length = (int)(2800 / distance);
+        my_mlx_draw_line(&vars->img2, sx, 60 - line_length / 2, sx, 60 + line_length / 2, color);
+    }
+}
+
+void draw_player_view_line(t_vars *vars)
+{
+    t_player *player = &vars->player;
+    t_line way, player_ray;
 
     int line_length = VIEW_LENGTH;
     int i = 0;
@@ -125,19 +142,8 @@ void draw_player_view_line(t_vars *vars)
         t_wall *wall;
         while (wall = get_wall(j))
         {
-            t_pos cross_point;
-
-            if (do_intersect(&wall->line, &way) && get_intersection(&wall->line, &way, &cross_point))
-            {
-                color = wall->color;
-                draw_circle(&vars->img, &vars->camera, &cross_point, 3, color);
-                // ミニウィンドウにラインを描画
-                double cos_theta = cosine_angle(player->x, player->y, player_ray_x, player_ray_y, cross_point.x, cross_point.y);
-                double distance = sqrt(distance_squared(way.p0.x, way.p0.y, cross_point.x, cross_point.y)) * cos_theta;
-                int line_length = (int)(2800 / distance);
-                int x = vars->img2.w / 2 + (i - kazu / 2) * 10;
-                my_mlx_draw_line(&vars->img2, x, 60 - line_length / 2, x, 60 + line_length / 2, color);
-            }
+            int x = vars->img2.w / 2 + (i - kazu / 2) * 10;
+            draw_miniwindow(vars, wall, &way, x);
             j++;
         }
         i++;
