@@ -28,7 +28,7 @@ $(TARGET): $(OBJS)
 
 # クリーンアップルール
 clean:
-	rm -f $(OBJS) $(TARGET) $(TEST_OBJ)
+	rm -f $(OBJS) $(TARGET) $(TEST_OBJ) $(TEST_TARGET)
 
 # ディペンデンシの自動生成（オプション）
 depend: $(SRCS)
@@ -45,6 +45,10 @@ TEST_SRC = tests/my_tests.cpp
 TEST_TARGET_SRCS = drawing.c player.c wall.c
 TEST_TARGET = run_tests
 TEST_OBJ = $(TEST_TARGET_SRCS:.c=.o) $(TEST_SRC:.cpp=.o)
+
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
 
 tests: $(TEST_TARGET)
 	./$(TEST_TARGET)

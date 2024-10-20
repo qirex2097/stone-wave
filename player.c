@@ -9,8 +9,6 @@
 #define PLAYER_COLOR 0x00ff0000
 #define TEXT_COLOR 0x00ffffff
 
-double cosine_angle(int x1, int y1, int x2, int y2, int x3, int y3);
-
 int init_player(t_player *player)
 {
     if (player == NULL)
@@ -114,6 +112,8 @@ void draw_miniwindow(t_vars *vars, t_wall *wall, t_line *way, int sx)
         // ミニウィンドウにラインを描画
         double cos_theta = cosine_angle(player_ray_x, player_ray_y, player->x, player->y, cross_point.x, cross_point.y);
         double distance = sqrt(distance_squared(way->p0.x, way->p0.y, cross_point.x, cross_point.y)) * cos_theta;
+        if (distance <= 0)
+            return;
         int line_length = (int)(2800 / distance);
         my_mlx_draw_line(&vars->img2, sx, 60 - line_length / 2, sx, 60 + line_length / 2, color);
     }
@@ -128,9 +128,9 @@ void draw_player_view_line(t_vars *vars)
 
     double radian = (player->angle * PI) / 180.0;
     screen_line.p0.x = player->x + VIEW_LENGTH * cos(radian - PI / 4.0);
-    screen_line.p0.y = player->x + VIEW_LENGTH * sin(radian - PI / 4.0);
+    screen_line.p0.y = player->y + VIEW_LENGTH * sin(radian - PI / 4.0);
     screen_line.p1.x = player->x + VIEW_LENGTH * cos(radian + PI / 4.0);
-    screen_line.p1.y = player->x + VIEW_LENGTH * sin(radian + PI / 4.0);
+    screen_line.p1.y = player->y + VIEW_LENGTH * sin(radian + PI / 4.0);
     draw_line(&vars->img, &vars->camera, &screen_line, 0x00ffffff);
 
     int sx = 0;
@@ -143,10 +143,11 @@ void draw_player_view_line(t_vars *vars)
 
         int j = 0;
         t_wall *wall;
-        while (wall = get_wall(j))
+        wall = get_wall(j);
+        while (wall)
         {
             draw_miniwindow(vars, wall, &ray, sx);
-            j++;
+            wall = get_wall(++j);
         }
 
         sx++;
@@ -212,8 +213,8 @@ double cosine_angle(int x1, int y1, int x2, int y2, int x3, int y3)
     double len_v1 = sqrt((double)len_v1_sq);
     double len_v2 = sqrt((double)len_v2_sq);
 
-    // cosθ = dot / (|v1| * |v2|)
-    double cos_theta = (double)dot / (len_v1 * len_v2);
-
-    return cos_theta;
+    if (len_v1 == 0.0 || len_v2 == 0.0)
+        return 0.0;
+    else
+        return (double)dot / (len_v1 * len_v2); // cosθ = dot / (|v1| * |v2|)
 }
