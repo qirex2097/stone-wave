@@ -126,7 +126,7 @@ int update_player(t_vars *vars);
 int draw_player(t_vars *vars);
 
 /* wall.c */
-int init_wall();
+int init_wall(t_wall *param, int kazu);
 int update_wall(t_vars *vars);
 int draw_wall(t_vars *vars);
 t_wall *get_wall(int idx);
