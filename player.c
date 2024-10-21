@@ -71,46 +71,86 @@ int update_player(t_vars *vars)
     return 0;
 }
 
+void map_point_on_line(t_line *line, int w, int a, t_pos *point)
+{
+    if (line == NULL || point == NULL || w == 0)
+        return;
+    point->x = line->p0.x + (a * (line->p1.x - line->p0.x)) / w;
+    point->y = line->p0.y + (a * (line->p1.y - line->p0.y)) / w;
+}
+
+int find_intersection_point(t_vars *vars, t_line *line, t_pos *cross_point, int *color)
+{
+    t_wall *wall;
+    int j = 0;
+    int flg = 0;
+    while (wall = get_wall(j))
+    {
+        if (do_intersect(&wall->line, line) && get_intersection(&wall->line, line, cross_point))
+        {
+            *color = wall->color;
+            flg = 1;
+        }
+        j++;
+    }
+    return flg;
+}
+
+void draw_miniwindow(t_vars *vars, t_wall *wall, t_line *way, int sx)
+{
+    t_player *player = &vars->player;
+    t_pos cross_point;
+
+    double radian = (player->angle * PI) / 180.0;
+    int player_ray_x = player->x + (int)(VIEW_LENGTH * cos(radian));
+    int player_ray_y = player->y + (int)(VIEW_LENGTH * sin(radian));
+
+    if (do_intersect(&wall->line, way) && get_intersection(&wall->line, way, &cross_point))
+    {
+        int color = wall->color;
+        draw_circle(&vars->img, &vars->camera, &cross_point, 3, color);
+        // ミニウィンドウにラインを描画
+        double cos_theta = cosine_angle(player_ray_x, player_ray_y, player->x, player->y, cross_point.x, cross_point.y);
+        double distance = sqrt(distance_squared(way->p0.x, way->p0.y, cross_point.x, cross_point.y)) * cos_theta;
+        if (distance <= 0)
+            return;
+        int line_length = (int)(2800 / distance);
+        my_mlx_draw_line(&vars->img2, sx, 60 - line_length / 2, sx, 60 + line_length / 2, color);
+    }
+}
+
 void draw_player_view_line(t_vars *vars)
 {
     t_player *player = &vars->player;
-    t_line way;
+    t_line way, player_ray;
 
-    way.p0.x = player->x;
-    way.p0.y = player->y;
+    t_line screen_line;
 
-    int line_length = VIEW_LENGTH;
-    int i = 0;
-    int kazu = 15;
-    int kakudo = 7;
-    while (i < kazu)
+    double radian = (player->angle * PI) / 180.0;
+    screen_line.p0.x = player->x + VIEW_LENGTH * cos(radian - PI / 4.0);
+    screen_line.p0.y = player->y + VIEW_LENGTH * sin(radian - PI / 4.0);
+    screen_line.p1.x = player->x + VIEW_LENGTH * cos(radian + PI / 4.0);
+    screen_line.p1.y = player->y + VIEW_LENGTH * sin(radian + PI / 4.0);
+    draw_line(&vars->img, &vars->camera, &screen_line, 0x00ffffff);
+
+    int sx = 0;
+    while (sx < vars->img2.w)
     {
-        t_pos cross_point;
-        int color = 0x0000ff00;
-        double radian = (player->angle + (i - kazu / 2) * kakudo) * PI / 180.0;
-        way.p1.x = player->x + (int)(line_length * cos(radian));
-        way.p1.y = player->y + (int)(line_length * sin(radian));
-        draw_line(&vars->img, &vars->camera, &way, color);
+        t_line ray;
+        ray.p0.x = player->x;
+        ray.p0.y = player->y;
+        map_point_on_line(&screen_line, vars->img2.w, sx, &ray.p1);
 
         int j = 0;
         t_wall *wall;
-        while (wall = get_wall(j))
+        wall = get_wall(j);
+        while (wall)
         {
-            if (do_intersect(&wall->line, &way) && get_intersection(&wall->line, &way, &cross_point))
-            {
-                color = wall->color;
-                draw_circle(&vars->img, &vars->camera, &cross_point, 3, color);
-                // ミニウィンドウにラインを描画
-                // TODO 距離に応じてラインの長さを変える
-                double theta = (i - kazu / 2) * kakudo * PI / 180.0;
-                double distance = sqrt(distance_squared(way.p0.x, way.p0.y, cross_point.x, cross_point.y)) * cos(theta);
-                int line_length = (int)(2800 / distance);
-                int x = vars->img2.w / 2 + (i - kazu / 2) * 10;
-                my_mlx_draw_line(&vars->img2, x, 60 - line_length / 2, x, 60 + line_length / 2, color);
-            }
-            j++;
+            draw_miniwindow(vars, wall, &ray, sx);
+            wall = get_wall(++j);
         }
-        i++;
+
+        sx++;
     }
 }
 
@@ -141,4 +181,40 @@ int draw_player(t_vars *vars)
     render_player_info(vars);
 
     return 0;
+}
+
+// ベクトルの内積を計算
+long long dot_product(int x1, int y1, int x2, int y2)
+{
+    return (long long)x1 * x2 + (long long)y1 * y2;
+}
+
+// ベクトルの長さの平方を計算
+long long vector_length_squared(int x, int y)
+{
+    return (long long)x * x + (long long)y * y;
+}
+
+// 三点 (x1, y1), (x2, y2), (x3, y3) を結ぶ直線の角度のコサインを計算
+double cosine_angle(int x1, int y1, int x2, int y2, int x3, int y3)
+{
+    // ベクトル v1 = (x2 - x1, y2 - y1), ベクトル v2 = (x3 - x2, y3 - y2)
+    int v1x = x1 - x2, v1y = y1 - y2;
+    int v2x = x3 - x2, v2y = y3 - y2;
+
+    // 内積 v1・v2
+    long long dot = dot_product(v1x, v1y, v2x, v2y);
+
+    // v1 の長さの平方と v2 の長さの平方
+    long long len_v1_sq = vector_length_squared(v1x, v1y);
+    long long len_v2_sq = vector_length_squared(v2x, v2y);
+
+    // ベクトルの大きさ (長さ) を平方根で求める
+    double len_v1 = sqrt((double)len_v1_sq);
+    double len_v2 = sqrt((double)len_v2_sq);
+
+    if (len_v1 == 0.0 || len_v2 == 0.0)
+        return 0.0;
+    else
+        return (double)dot / (len_v1 * len_v2); // cosθ = dot / (|v1| * |v2|)
 }

@@ -1,15 +1,14 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include "stone.h"
 
-static t_wall wall[] = {
-    {{{-50, -50}, {-50, 50}}, 0x00ff0000},
-    {{{-50, 50}, {50, 50}}, 0x0000ff00},
-    {{{50, 50}, {50, -50}}, 0x000000ff},
-    {{{50, -50}, {-50, -50}}, 0x00ff8000},
-};
+static t_wall *wall;
+static int wall_kazu;
 
-int init_wall()
+int init_wall(t_wall *param, int kazu)
 {
+    wall = param;
+    wall_kazu = kazu;
     return 0;
 }
 
@@ -30,7 +29,7 @@ int update_wall(t_vars *vars)
 
 t_wall *get_wall(int idx)
 {
-    if (idx < 0 || sizeof(wall) / sizeof(t_line) <= idx)
+    if (idx < 0 || wall_kazu <= idx)
         return NULL;
     return &wall[idx];
 }

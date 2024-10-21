@@ -1,3 +1,5 @@
 a.out
 *.o
 stone
+googletest/
+run_tests

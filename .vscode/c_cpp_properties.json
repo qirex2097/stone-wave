@@ -4,7 +4,8 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${workspaceFolder}/minilibx-linux"
+                "${workspaceFolder}/minilibx-linux",
+                "${workspaceFolder}/googletest/include"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",

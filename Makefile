@@ -28,7 +28,7 @@ $(TARGET): $(OBJS)
 
 # クリーンアップルール
 clean:
-	rm -f $(OBJS) $(TARGET)
+	rm -f $(OBJS) $(TARGET) $(TEST_OBJ) $(TEST_TARGET)
 
 # ディペンデンシの自動生成（オプション）
 depend: $(SRCS)
@@ -36,3 +36,24 @@ depend: $(SRCS)
 
 # ディペンデンシファイルのインクルード
 -include .depend
+
+# テスト用
+CXX = g++
+CXXFLAGS = -I./googletest -I./googletest/include -pthread
+GOOGLE_TEST_OBJS = googletest/src/gtest-all.o googletest/src/gtest_main.o
+TEST_SRC = tests/my_tests.cpp
+TEST_TARGET_SRCS = drawing.c player.c wall.c
+TEST_TARGET = run_tests
+TEST_OBJ = $(TEST_TARGET_SRCS:.c=.o) $(TEST_SRC:.cpp=.o)
+
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+
+tests: $(TEST_TARGET)
+	./$(TEST_TARGET)
+
+$(TEST_TARGET): $(TEST_OBJ) $(OBJS) $(GOOGLE_TEST_OBJS)
+	$(CXX) $(TEST_OBJ) $(GOOGLE_TEST_OBJS) -o $(TEST_TARGET)
+
+.PHONY: tests
