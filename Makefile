@@ -16,7 +16,7 @@ SRCS = $(wildcard *.c)
 OBJS = $(SRCS:.c=.o)
 
 # ルール定義
-all: $(TARGET)
+all: $(TARGET) tests
 
 # 実行ファイルのビルドルール
 $(TARGET): $(OBJS)
@@ -42,7 +42,7 @@ CXX = g++
 CXXFLAGS = -I./googletest -I./googletest/include -pthread
 GOOGLE_TEST_OBJS = googletest/src/gtest-all.o googletest/src/gtest_main.o
 TEST_SRC = tests/my_tests.cpp
-TEST_TARGET_SRCS = drawing.c player.c wall.c
+TEST_TARGET_SRCS = utils.c drawing.c drawing_utils.c player.c wall.c
 TEST_TARGET = run_tests
 TEST_OBJ = $(TEST_TARGET_SRCS:.c=.o) $(TEST_SRC:.cpp=.o)
 

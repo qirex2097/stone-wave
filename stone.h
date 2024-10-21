@@ -42,6 +42,13 @@
 #define KEY_K 107
 #define KEY_L 108
 
+typedef enum
+{
+    COLLINEAR = 0,
+    CLOCKWISE,
+    COUNTERCLOCKWISE,
+} Orientation;
+
 typedef struct
 {
     int x, y;
@@ -106,18 +113,24 @@ typedef struct
 /* main.c */
 void cleanup(t_vars *vars);
 
+/* utils.c */
+long long distance_squared(int x1, int y1, int x2, int y2);
+double cosine_angle(int x1, int y1, int x2, int y2, int x3, int y3);
+
 /* drawing.c */
 void my_mlx_pixel_put(t_img *data, int x, int y, int color);
 void my_mlx_draw_line(t_img *data, int x0, int y0, int x1, int y1, int color);
 void draw_line_s(t_img *data, t_line *line, int color);
 void draw_circle_s(t_img *img, t_pos *center, int radius, int color);
+void draw_line(t_img *data, t_camera *camera, t_line *line, int color);
+void draw_circle(t_img *img, t_camera *camera, t_pos *center, int radius, int color);
+
+/* drawing_utils.c */
 int do_intersect(t_line *line1, t_line *line2);
 int get_intersection(t_line *line0, t_line *line1, t_pos *cross_point);
 void convert_to_screen(t_pos *field, t_pos_s *screen, t_img *img, t_camera *camera);
 void convert_to_field(t_pos_s *screen, t_pos *field, t_img *img, t_camera *camera);
-void draw_line(t_img *data, t_camera *camera, t_line *line, int color);
-void draw_circle(t_img *img, t_camera *camera, t_pos *center, int radius, int color);
-long long distance_squared(int x1, int y1, int x2, int y2);
+void map_point_on_line(t_line *line, int w, int a, t_pos *point);
 
 /* player.c */
 int init_player(t_player *player);

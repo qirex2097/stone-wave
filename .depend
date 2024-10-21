@@ -1,6 +1,9 @@
+camera.o: camera.c stone.h
 drawing.o: drawing.c stone.h
+drawing_utils.o: drawing_utils.c stone.h
 key_handler.o: key_handler.c stone.h
 main.o: main.c stone.h
 mini_window.o: mini_window.c stone.h
 player.o: player.c stone.h
+utils.o: utils.c
 wall.o: wall.c stone.h
