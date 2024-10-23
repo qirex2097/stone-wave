@@ -41,6 +41,9 @@ int do_intersect(t_line *line1, t_line *line2)
 
 int get_intersection(t_line *line0, t_line *line1, t_pos *cross_point)
 {
+    if (!do_intersect(line0, line1))
+        return 0;
+
     int x1 = line0->p0.x, y1 = line0->p0.y;
     int x2 = line0->p1.x, y2 = line0->p1.y;
     int x3 = line1->p0.x, y3 = line1->p0.y;

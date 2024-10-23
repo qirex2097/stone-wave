@@ -42,7 +42,7 @@ int update_player(t_vars *vars)
     int dx, dy, dangle;
     double radian = (player->angle) * PI / 180.0;
 
-    dx = dy = 5;
+    dx = dy = 2;
     dangle = 1;
     if (mouse->button & TURN_LEFT)
         player->angle -= dangle;
@@ -78,7 +78,7 @@ int find_intersection_point(t_vars *vars, t_line *line, t_pos *cross_point, int 
     int flg = 0;
     while (wall = get_wall(j))
     {
-        if (do_intersect(&wall->line, line) && get_intersection(&wall->line, line, cross_point))
+        if (get_intersection(&wall->line, line, cross_point))
         {
             *color = wall->color;
             flg = 1;
@@ -86,29 +86,6 @@ int find_intersection_point(t_vars *vars, t_line *line, t_pos *cross_point, int 
         j++;
     }
     return flg;
-}
-
-void draw_miniwindow(t_vars *vars, t_wall *wall, t_line *way, int sx)
-{
-    t_player *player = &vars->player;
-    t_pos cross_point;
-
-    double radian = (player->angle * PI) / 180.0;
-    int player_ray_x = player->x + (int)(VIEW_LENGTH * cos(radian));
-    int player_ray_y = player->y + (int)(VIEW_LENGTH * sin(radian));
-
-    if (do_intersect(&wall->line, way) && get_intersection(&wall->line, way, &cross_point))
-    {
-        int color = wall->color;
-        draw_circle(&vars->img, &vars->camera, &cross_point, 3, color);
-        // ミニウィンドウにラインを描画
-        double cos_theta = cosine_angle(player_ray_x, player_ray_y, player->x, player->y, cross_point.x, cross_point.y);
-        double distance = sqrt(distance_squared(way->p0.x, way->p0.y, cross_point.x, cross_point.y)) * cos_theta;
-        if (distance <= 0)
-            return;
-        int line_length = (int)(2800 / distance);
-        my_mlx_draw_line(&vars->img2, sx, 60 - line_length / 2, sx, 60 + line_length / 2, color);
-    }
 }
 
 void draw_player_view_line(t_vars *vars)

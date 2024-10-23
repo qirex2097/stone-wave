@@ -3,12 +3,13 @@
 #include <string>
 extern "C"
 {
-#include "../stone.h" // テスト対象のヘッダー
+#include "../srcs/stone.h" // テスト対象のヘッダー
     extern double cosine_angle(int x1, int y1, int x2, int y2, int x3, int y3);
     extern void map_point_on_line(t_line *line, int w, int a, t_pos *point);
-    extern int find_intersection_point(t_line *line, t_pos *cross_point, int *color);
+    extern int find_intersection_point(t_vars *vars, t_line *line, t_pos *cross_point, int *color);
 
     int mlx_string_put(void *xvar, void *win, int x, int y, int color, char *string) { return 0; }
+    void draw_miniwindow(t_vars *vars, t_wall *wall, t_line *way, int sx) {}
 }
 
 TEST(MyLibraryTest, FunctionReturnsExpectedValue)
@@ -47,4 +48,25 @@ TEST_F(WallTest, Test)
     int color;
     wall = get_wall(0);
     EXPECT_EQ(wall->line.p0.x, -50);
+    line.p0.x = 0;
+    line.p0.y = 0;
+    line.p1.x = -100;
+    line.p1.y = 0;
+    EXPECT_TRUE(get_intersection(&wall->line, &line, &cross_point));
+    EXPECT_EQ(cross_point.x, -50);
+    EXPECT_EQ(cross_point.y, 0);
+    line.p0.x = 0;
+    line.p0.y = 0;
+    line.p1.x = -50;
+    line.p1.y = -50;
+    EXPECT_TRUE(get_intersection(&wall->line, &line, &cross_point));
+    EXPECT_EQ(cross_point.x, -50);
+    EXPECT_EQ(cross_point.y, -50);
+    line.p0.x = -50;
+    line.p0.y = -100;
+    line.p1.x = -50;
+    line.p1.y = -50;
+    EXPECT_TRUE(get_intersection(&wall->line, &line, &cross_point));
+    EXPECT_EQ(cross_point.x, -50);
+    EXPECT_EQ(cross_point.y, -50);
 }

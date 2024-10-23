@@ -126,7 +126,6 @@ void draw_line(t_img *data, t_camera *camera, t_line *line, int color);
 void draw_circle(t_img *img, t_camera *camera, t_pos *center, int radius, int color);
 
 /* drawing_utils.c */
-int do_intersect(t_line *line1, t_line *line2);
 int get_intersection(t_line *line0, t_line *line1, t_pos *cross_point);
 void convert_to_screen(t_pos *field, t_pos_s *screen, t_img *img, t_camera *camera);
 void convert_to_field(t_pos_s *screen, t_pos *field, t_img *img, t_camera *camera);
@@ -157,5 +156,6 @@ int update_camera(t_vars *vars);
 /* mini_window.c */
 int init_mini_window(t_vars *vars);
 int render_mini_window(t_vars *vars);
+void draw_miniwindow(t_vars *vars, t_wall *wall, t_line *way, int sx);
 
 #endif //_STONE_H_

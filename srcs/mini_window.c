@@ -1,9 +1,10 @@
 #include <mlx.h>
 #include <string.h>
+#include <math.h>
 #include "stone.h"
 
-#define MINIWINDOW_W 160
-#define MINIWINDOW_H 120
+#define MINIWINDOW_W 320
+#define MINIWINDOW_H 240
 
 int init_mini_window(t_vars *vars)
 {
@@ -31,4 +32,28 @@ int render_mini_window(t_vars *vars)
     my_mlx_draw_line(&vars->img2, 0, MINIWINDOW_H - 1, 0, 0, 0x00ff00ff);
 
     return 0;
+}
+
+void draw_miniwindow(t_vars *vars, t_wall *wall, t_line *way, int sx)
+{
+    const int VIEW_LENGTH = 100;
+    t_player *player = &vars->player;
+    t_pos cross_point;
+
+    double radian = (player->angle * PI) / 180.0;
+    int player_ray_x = player->x + (int)(VIEW_LENGTH * cos(radian));
+    int player_ray_y = player->y + (int)(VIEW_LENGTH * sin(radian));
+
+    if (get_intersection(&wall->line, way, &cross_point))
+    {
+        int color = wall->color;
+        draw_circle(&vars->img, &vars->camera, &cross_point, 3, color);
+        // ミニウィンドウにラインを描画
+        double cos_theta = cosine_angle(player_ray_x, player_ray_y, player->x, player->y, cross_point.x, cross_point.y);
+        double distance = sqrt(distance_squared(way->p0.x, way->p0.y, cross_point.x, cross_point.y)) * cos_theta;
+        if (distance <= 0)
+            return;
+        int line_length = (int)(2800 / distance);
+        my_mlx_draw_line(&vars->img2, sx, MINIWINDOW_H / 2 - line_length / 2, sx, MINIWINDOW_H / 2 + line_length / 2, color);
+    }
 }

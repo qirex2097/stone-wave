@@ -10,7 +10,7 @@ LDFLAGS = -L$(MLX_DIR) -lm -lmlx -lX11 -lXext
 TARGET = stone
 
 # ソースファイル
-SRCS = $(wildcard *.c)
+SRCS = $(wildcard srcs/*.c)
 
 # オブジェクトファイルの指定（.c -> .o に変換）
 OBJS = $(SRCS:.c=.o)
@@ -42,7 +42,7 @@ CXX = g++
 CXXFLAGS = -I./googletest -I./googletest/include -pthread
 GOOGLE_TEST_OBJS = googletest/src/gtest-all.o googletest/src/gtest_main.o
 TEST_SRC = tests/my_tests.cpp
-TEST_TARGET_SRCS = utils.c drawing.c drawing_utils.c player.c wall.c
+TEST_TARGET_SRCS = $(filter-out srcs/main.c srcs/mini_window.c srcs/key_handler.c, $(wildcard srcs/*.c))
 TEST_TARGET = run_tests
 TEST_OBJ = $(TEST_TARGET_SRCS:.c=.o) $(TEST_SRC:.cpp=.o)
 
