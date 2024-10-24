@@ -6,6 +6,7 @@
 #define MINIWINDOW_W 320
 #define MINIWINDOW_H 240
 #define VIEW_LENGTH 300
+#define WALL_HEIGHT 10000
 
 int init_mini_window(t_vars *vars)
 {
@@ -47,12 +48,15 @@ void draw_miniwindow(t_vars *vars, t_wall *wall, t_line *way, int sx)
 {
     t_player *player = &vars->player;
     t_pos cross_point;
+    t_line way3;
 
     double radian = (player->angle * PI) / 180.0;
     int player_ray_x = player->x + (int)(VIEW_LENGTH * cos(radian));
     int player_ray_y = player->y + (int)(VIEW_LENGTH * sin(radian));
 
-    if (get_intersection(&wall->line, way, &cross_point))
+    scale_segment(way, 5, &way3);
+
+    if (get_intersection(&wall->line, &way3, &cross_point))
     {
         int color = wall->color;
         draw_circle(&vars->img, &vars->camera, &cross_point, 3, color);
@@ -61,7 +65,7 @@ void draw_miniwindow(t_vars *vars, t_wall *wall, t_line *way, int sx)
         double distance = sqrt(distance_squared(way->p0.x, way->p0.y, cross_point.x, cross_point.y)) * cos_theta;
         if (distance <= 0)
             return;
-        int line_length = (int)(2800 / distance);
+        int line_length = (int)(WALL_HEIGHT / distance);
         my_mlx_draw_line(&vars->img2, sx, MINIWINDOW_H / 2 - line_length / 2, sx, MINIWINDOW_H / 2 + line_length / 2, color);
     }
 }

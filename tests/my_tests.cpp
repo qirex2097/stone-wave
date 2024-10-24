@@ -17,6 +17,17 @@ TEST(MyLibraryTest, FunctionReturnsExpectedValue)
 {
     EXPECT_EQ(distance_squared(0, 0, 1, 1), 2); // 例: my_functionは2倍する関数
     EXPECT_EQ(cosine_angle(0, 0, 0, 1, 1, 1), 0);
+
+    t_line line, line_new;
+    line.p0.x = 0;
+    line.p0.y = 0;
+    line.p1.x = 100;
+    line.p1.y = 200;
+    scale_segment(&line, 3, &line_new);
+    EXPECT_EQ(line_new.p0.x, 0);
+    EXPECT_EQ(line_new.p0.y, 0);
+    EXPECT_EQ(line_new.p1.x, 300);
+    EXPECT_EQ(line_new.p1.y, 600);
 }
 
 /*----------------------------------------*/

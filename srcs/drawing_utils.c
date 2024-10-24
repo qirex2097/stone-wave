@@ -97,3 +97,11 @@ void convert_to_field(t_pos_s *screen, t_pos *field, t_img *img, t_camera *camer
     field->x = screen->x * camera->w / img->w + camera->x;
     field->y = screen->y * camera->h / img->h + camera->y;
 }
+
+void scale_segment(t_line *line, int a, t_line *line_new)
+{
+    line_new->p0.x = line->p0.x;
+    line_new->p0.y = line->p0.y;
+    line_new->p1.x = line->p0.x + a * (line->p1.x - line->p0.x);
+    line_new->p1.y = line->p0.y + a * (line->p1.y - line->p0.y);
+}

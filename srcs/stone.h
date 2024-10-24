@@ -137,6 +137,7 @@ int get_intersection(t_line *line0, t_line *line1, t_pos *cross_point);
 void convert_to_screen(t_pos *field, t_pos_s *screen, t_img *img, t_camera *camera);
 void convert_to_field(t_pos_s *screen, t_pos *field, t_img *img, t_camera *camera);
 void map_point_on_line(t_line *line, int w, int a, t_pos *point);
+void scale_segment(t_line *line, int a, t_line *line_new);
 
 /* player.c */
 int init_player(t_player *player, int x, int y);
