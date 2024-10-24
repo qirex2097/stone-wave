@@ -10,7 +10,8 @@ LDFLAGS = -L$(MLX_DIR) -lm -lmlx -lX11 -lXext
 TARGET = stone
 
 # ソースファイル
-SRCS = $(wildcard srcs/*.c)
+SRCDIR = srcs
+SRCS = $(wildcard $(SRCDIR)/*.c)
 
 # オブジェクトファイルの指定（.c -> .o に変換）
 OBJS = $(SRCS:.c=.o)

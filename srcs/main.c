@@ -86,10 +86,10 @@ int initialize_mlx(t_vars *vars)
 }
 
 static t_wall wall[] = {
-    {{{-50, -50}, {-50, 50}}, 0x00ff0000},
-    {{{-50, 50}, {50, 50}}, 0x0080ff00},
-    {{{50, 50}, {50, -50}}, 0x008060ff},
-    {{{50, -50}, {-50, -50}}, 0x00ff8000},
+    {{{100, 100}, {900, 100}}, 0x00ff0000},
+    {{{900, 100}, {900, 900}}, 0x0080ff00},
+    {{{900, 900}, {100, 900}}, 0x008060ff},
+    {{{100, 900}, {100, 100}}, 0x00ff8000},
 };
 
 int main(void)
@@ -102,8 +102,9 @@ int main(void)
         exit(1);
     }
 
-    init_camera(&vars.camera, 0 - FIELD_W / 2, 0 - FIELD_H / 2, FIELD_W, FIELD_H);
-    init_player(&vars.player);
+    vars.map = init_map(10, 10);
+    init_camera(&vars.camera, 0, 0, 10 * 100, 10 * 100);
+    init_player(&vars.player, 5 * 100, 5 * 100);
     init_wall(wall, sizeof(wall) / sizeof(t_wall));
     init_mouse(&vars.mouse);
 

@@ -100,6 +100,12 @@ typedef struct
 
 typedef struct
 {
+    char **data;
+    int w, h;
+} t_map;
+
+typedef struct
+{
     void *mlx;
     void *mlx_win;
     t_camera camera;
@@ -108,6 +114,7 @@ typedef struct
     t_player player;
     t_mouse mouse;
     int mini_x, mini_y;
+    t_map *map;
 } t_vars;
 
 /* main.c */
@@ -132,7 +139,7 @@ void convert_to_field(t_pos_s *screen, t_pos *field, t_img *img, t_camera *camer
 void map_point_on_line(t_line *line, int w, int a, t_pos *point);
 
 /* player.c */
-int init_player(t_player *player);
+int init_player(t_player *player, int x, int y);
 int init_mouse(t_mouse *mouse);
 int update_player(t_vars *vars);
 int draw_player(t_vars *vars);
@@ -143,6 +150,7 @@ int init_wall(t_wall *param, int kazu);
 int update_wall(t_vars *vars);
 int draw_wall(t_vars *vars);
 t_wall *get_wall(int idx);
+int find_intersection_point(t_vars *vars, t_line *line, t_pos *cross_point, t_wall *wall_);
 
 /* key_hendler.c */
 int key_press_handler(int keycode, void *param);
@@ -157,5 +165,10 @@ int update_camera(t_vars *vars);
 int init_mini_window(t_vars *vars);
 int render_mini_window(t_vars *vars);
 void draw_miniwindow(t_vars *vars, t_wall *wall, t_line *way, int sx);
+void draw_player_view_line(t_vars *vars);
+
+/* map.c */
+t_map *init_map(int w, int h);
+void free_map(t_map *map);
 
 #endif //_STONE_H_

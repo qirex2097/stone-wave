@@ -33,3 +33,20 @@ t_wall *get_wall(int idx)
         return NULL;
     return &wall[idx];
 }
+
+int find_intersection_point(t_vars *vars, t_line *line, t_pos *cross_point, t_wall *wall_)
+{
+    t_wall *wall;
+    int j = 0;
+    int flg = 0;
+    while (wall = get_wall(j))
+    {
+        if (get_intersection(&wall->line, line, cross_point))
+        {
+            wall_ = wall;
+            flg = 1;
+        }
+        j++;
+    }
+    return flg;
+}

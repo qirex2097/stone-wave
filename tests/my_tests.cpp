@@ -6,10 +6,11 @@ extern "C"
 #include "../srcs/stone.h" // テスト対象のヘッダー
     extern double cosine_angle(int x1, int y1, int x2, int y2, int x3, int y3);
     extern void map_point_on_line(t_line *line, int w, int a, t_pos *point);
-    extern int find_intersection_point(t_vars *vars, t_line *line, t_pos *cross_point, int *color);
+    extern int do_intersect(t_line *line1, t_line *line2);
 
     int mlx_string_put(void *xvar, void *win, int x, int y, int color, char *string) { return 0; }
     void draw_miniwindow(t_vars *vars, t_wall *wall, t_line *way, int sx) {}
+    void draw_player_view_line(t_vars *vars) {}
 }
 
 TEST(MyLibraryTest, FunctionReturnsExpectedValue)
@@ -66,7 +67,31 @@ TEST_F(WallTest, Test)
     line.p0.y = -100;
     line.p1.x = -50;
     line.p1.y = -50;
+    EXPECT_TRUE(do_intersect(&wall->line, &line));
     EXPECT_TRUE(get_intersection(&wall->line, &line, &cross_point));
     EXPECT_EQ(cross_point.x, -50);
     EXPECT_EQ(cross_point.y, -50);
+}
+
+class MapTest : public ::testing::Test
+{
+protected:
+    void SetUp() override
+    {
+    }
+
+    void TearDown() override
+    {
+    }
+};
+
+TEST_F(MapTest, Test)
+{
+    t_map *map;
+    map = init_map(10, 10);
+    EXPECT_TRUE(map);
+    EXPECT_STREQ(map->data[0], "1111111111");
+    EXPECT_STREQ(map->data[1], "1000000001");
+    EXPECT_STREQ(map->data[10 - 1], "1111111111");
+    free_map(map);
 }

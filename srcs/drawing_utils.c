@@ -53,6 +53,23 @@ int get_intersection(t_line *line0, t_line *line1, t_pos *cross_point)
 
     if (denom == 0)
     {
+        // 同一直線上に存在するか
+        if (orientation(&line0->p0, &line0->p1, &line1->p0) == COLLINEAR)
+        {
+            // line0上にline1の端点が乗っているか
+            if (on_segment(&line0->p0, &line0->p1, &line1->p0))
+            {
+                cross_point->x = line1->p0.x;
+                cross_point->y = line1->p0.y;
+                return 1;
+            }
+            else if (on_segment(&line0->p0, &line0->p1, &line1->p1))
+            {
+                cross_point->x = line1->p1.x;
+                cross_point->y = line1->p1.y;
+                return 1;
+            }
+        }
         return 0;
     }
 
@@ -79,12 +96,4 @@ void convert_to_field(t_pos_s *screen, t_pos *field, t_img *img, t_camera *camer
         return;
     field->x = screen->x * camera->w / img->w + camera->x;
     field->y = screen->y * camera->h / img->h + camera->y;
-}
-
-void map_point_on_line(t_line *line, int w, int a, t_pos *point)
-{
-    if (line == NULL || point == NULL || w == 0)
-        return;
-    point->x = line->p0.x + (a * (line->p1.x - line->p0.x)) / w;
-    point->y = line->p0.y + (a * (line->p1.y - line->p0.y)) / w;
 }
