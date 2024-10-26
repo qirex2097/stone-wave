@@ -18,7 +18,8 @@ int render_next_frame(void *param)
 
     memset(img->addr, 0, WINDOW_W * WINDOW_H * (img->bits_per_pixel / 8));
     draw_player(vars);
-    draw_wall(vars);
+    // draw_wall(vars);
+    draw_map(vars);
 
     if (vars->mouse.button & SHOW_MINIWINDOW)
     {
@@ -104,7 +105,7 @@ int main(void)
 
     vars.map = init_map(10, 10);
     init_camera(&vars.camera, 0, 0, 10 * 100, 10 * 100);
-    init_player(&vars.player, 5 * 100, 5 * 100);
+    init_player(&vars.player, 5 * 100 + 50, 5 * 100 + 50);
     init_wall(wall, sizeof(wall) / sizeof(t_wall));
     init_mouse(&vars.mouse);
 

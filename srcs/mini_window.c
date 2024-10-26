@@ -70,19 +70,9 @@ void draw_miniwindow(t_vars *vars, t_wall *wall, t_line *way, int sx)
     }
 }
 
-void draw_player_view_line(t_vars *vars)
+void draw_player_view(t_vars *vars, t_line *screen)
 {
     t_player *player = &vars->player;
-    t_line way, player_ray;
-
-    t_line screen_line;
-
-    double radian = (player->angle * PI) / 180.0;
-    screen_line.p0.x = player->x + VIEW_LENGTH * cos(radian - PI / 4.0);
-    screen_line.p0.y = player->y + VIEW_LENGTH * sin(radian - PI / 4.0);
-    screen_line.p1.x = player->x + VIEW_LENGTH * cos(radian + PI / 4.0);
-    screen_line.p1.y = player->y + VIEW_LENGTH * sin(radian + PI / 4.0);
-    draw_line(&vars->img, &vars->camera, &screen_line, 0x00ffffff);
 
     int sx = 0;
     while (sx < vars->img2.w)
@@ -90,7 +80,7 @@ void draw_player_view_line(t_vars *vars)
         t_line ray;
         ray.p0.x = player->x;
         ray.p0.y = player->y;
-        map_point_on_line(&screen_line, vars->img2.w, sx, &ray.p1);
+        map_point_on_line(screen, vars->img2.w, sx, &ray.p1);
 
         int j = 0;
         t_wall *wall;

@@ -70,6 +70,24 @@ int update_player(t_vars *vars)
     return 0;
 }
 
+#define VIEW_LENGTH 300
+void draw_player_view_line(t_vars *vars)
+{
+    t_player *player = &vars->player;
+    t_line way, player_ray;
+
+    t_line screen_line;
+
+    double radian = (player->angle * PI) / 180.0;
+    screen_line.p0.x = player->x + VIEW_LENGTH * cos(radian - PI / 4.0);
+    screen_line.p0.y = player->y + VIEW_LENGTH * sin(radian - PI / 4.0);
+    screen_line.p1.x = player->x + VIEW_LENGTH * cos(radian + PI / 4.0);
+    screen_line.p1.y = player->y + VIEW_LENGTH * sin(radian + PI / 4.0);
+    draw_line(&vars->img, &vars->camera, &screen_line, 0x00ffffff);
+
+    draw_player_view(vars, &screen_line);
+}
+
 void draw_player_lines(t_vars *vars)
 {
     t_player *player = &vars->player;

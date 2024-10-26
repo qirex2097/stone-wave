@@ -10,7 +10,7 @@ extern "C"
 
     int mlx_string_put(void *xvar, void *win, int x, int y, int color, char *string) { return 0; }
     void draw_miniwindow(t_vars *vars, t_wall *wall, t_line *way, int sx) {}
-    void draw_player_view_line(t_vars *vars) {}
+    void draw_player_view(t_vars *vars, t_line *screen) {}
 }
 
 TEST(MyLibraryTest, FunctionReturnsExpectedValue)

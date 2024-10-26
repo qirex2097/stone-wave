@@ -153,3 +153,22 @@ void draw_circle(t_img *img, t_camera *camera, t_pos *center, int radius, int co
         }
     }
 }
+
+void draw_rect(t_img *img, t_camera *camera, t_rect *rect, int color)
+{
+    t_line line;
+    line.p0.x = rect->x;
+    line.p0.y = rect->y;
+    line.p1.x = rect->x + rect->w;
+    line.p1.y = rect->y;
+    draw_line(img, camera, &line, color);
+    line.p0.x = rect->x + rect->w;
+    line.p0.y = rect->y + rect->h;
+    draw_line(img, camera, &line, color);
+    line.p1.x = rect->x;
+    line.p1.y = rect->y + rect->h;
+    draw_line(img, camera, &line, color);
+    line.p0.x = rect->x;
+    line.p0.y = rect->y;
+    draw_line(img, camera, &line, color);
+}

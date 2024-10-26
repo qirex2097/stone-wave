@@ -66,6 +66,12 @@ typedef struct
 
 typedef struct
 {
+    int x, y;
+    int w, h;
+} t_rect;
+
+typedef struct
+{
     void *img;
     char *addr;
     int bits_per_pixel;
@@ -131,6 +137,7 @@ void draw_line_s(t_img *data, t_line *line, int color);
 void draw_circle_s(t_img *img, t_pos *center, int radius, int color);
 void draw_line(t_img *data, t_camera *camera, t_line *line, int color);
 void draw_circle(t_img *img, t_camera *camera, t_pos *center, int radius, int color);
+void draw_rect(t_img *data, t_camera *camera, t_rect *rect, int color);
 
 /* drawing_utils.c */
 int get_intersection(t_line *line0, t_line *line1, t_pos *cross_point);
@@ -166,10 +173,11 @@ int update_camera(t_vars *vars);
 int init_mini_window(t_vars *vars);
 int render_mini_window(t_vars *vars);
 void draw_miniwindow(t_vars *vars, t_wall *wall, t_line *way, int sx);
-void draw_player_view_line(t_vars *vars);
+void draw_player_view(t_vars *vars, t_line *screen);
 
 /* map.c */
 t_map *init_map(int w, int h);
 void free_map(t_map *map);
+int draw_map(t_vars *);
 
 #endif //_STONE_H_

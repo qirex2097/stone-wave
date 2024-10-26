@@ -33,20 +33,32 @@ t_map *init_map(int w, int h)
         i++;
     }
     map->data[h] = NULL;
+    map->w = w;
+    map->h = h;
 
+    // サンプルマップ
     i = 0;
-    while (i < h)
+    while (i < map->h)
     {
         j = 0;
-        while (j < w)
+        while (j < map->w)
         {
-            if (i == 0 || i == h - 1 || j == 0 || j == w - 1)
+            if (i == 0 || i == map->h - 1 || j == 0 || j == map->w - 1)
                 map->data[i][j] = '1';
             else
                 map->data[i][j] = '0';
             j++;
         }
         i++;
+    }
+
+    int k = 0;
+    while (k < 5)
+    {
+        i = 1 + rand() % (map->h - 2);
+        j = 1 + rand() % (map->w - 2);
+        map->data[i][j] = '1';
+        k++;
     }
 
     return map;
@@ -68,4 +80,29 @@ void free_map(t_map *map)
     }
     free(map);
     return;
+}
+
+int draw_map(t_vars *vars)
+{
+    t_map *map = vars->map;
+    int i, j;
+    i = 0;
+    while (i < map->h)
+    {
+        j = 0;
+        while (j < map->w)
+        {
+            if (map->data[i][j] == '1')
+            {
+                t_rect rect;
+                rect.x = j * 100;
+                rect.y = i * 100;
+                rect.w = rect.h = 100;
+                draw_rect(&vars->img, &vars->camera, &rect, 0x00ff4080);
+            }
+            j++;
+        }
+        i++;
+    }
+    return 0;
 }
