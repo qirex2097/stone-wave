@@ -57,13 +57,12 @@ t_map *init_map(int w, int h)
         i++;
     }
 
-    int k = 0;
-    while (k < 5)
+    map->data[1][1] = '1';
+    if (map->w > 9 && map->h > 9)
     {
-        i = 1 + rand() % (map->h - 2);
-        j = 1 + rand() % (map->w - 2);
-        map->data[i][j] = '1';
-        k++;
+        map->data[1][8] = '1';
+        map->data[8][1] = '1';
+        map->data[8][8] = '1';
     }
 
     return map;
@@ -143,9 +142,6 @@ void ray_grid_intersection(t_map *map, t_pos ray_origin, t_vec ray_direction)
     int step_x = (ray_direction.x > 0) ? 1 : -1;
     int step_y = (ray_direction.y > 0) ? 1 : -1;
 
-    printf("(%d,%d),dir=(%d,%d)\n", current_pos_x, current_pos_y,
-           step_x * ray_direction_x, step_y * ray_direction_y);
-
     while (1)
     {
         // 次にXまたはY方向でセルの境界に到達するまでの距離
@@ -169,11 +165,8 @@ void ray_grid_intersection(t_map *map, t_pos ray_origin, t_vec ray_direction)
         current_pos_x += dx;
         current_pos_y += dy;
 
-        printf("(%d,%d)\n", current_pos_x, current_pos_y);
-
         if ((current_pos_x <= map->x || map->x + map->w * map->grid_size <= current_pos_x) ||
             (current_pos_y <= map->y || map->y + map->h * map->grid_size <= current_pos_y))
             break;
     }
-    printf("----------------------------------------\n");
 }

@@ -102,7 +102,7 @@ TEST_F(MapTest, Test)
     map = init_map(10, 10);
     EXPECT_TRUE(map);
     EXPECT_STREQ(map->data[0], "1111111111");
-    EXPECT_STREQ(map->data[1], "1000000001");
+    EXPECT_STREQ(map->data[2], "1000000001");
     EXPECT_STREQ(map->data[10 - 1], "1111111111");
     free_map(map);
 }
