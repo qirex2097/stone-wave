@@ -61,7 +61,7 @@ typedef struct
 
 typedef struct
 {
-    t_pos p0, p1;
+    int x0, y0, x1, y1;
 } t_line;
 
 typedef struct

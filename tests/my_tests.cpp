@@ -19,24 +19,24 @@ TEST(MyLibraryTest, FunctionReturnsExpectedValue)
     EXPECT_EQ(cosine_angle(0, 0, 0, 1, 1, 1), 0);
 
     t_line line, line_new;
-    line.p0.x = 0;
-    line.p0.y = 0;
-    line.p1.x = 100;
-    line.p1.y = 200;
+    line.x0 = 0;
+    line.y0 = 0;
+    line.x1 = 100;
+    line.y1 = 200;
     scale_segment(&line, 3, &line_new);
-    EXPECT_EQ(line_new.p0.x, 0);
-    EXPECT_EQ(line_new.p0.y, 0);
-    EXPECT_EQ(line_new.p1.x, 300);
-    EXPECT_EQ(line_new.p1.y, 600);
+    EXPECT_EQ(line_new.x0, 0);
+    EXPECT_EQ(line_new.y0, 0);
+    EXPECT_EQ(line_new.x1, 300);
+    EXPECT_EQ(line_new.y1, 600);
 }
 
 /*----------------------------------------*/
 
 static t_wall wall[] = {
-    {{{-50, -50}, {-50, 50}}, 0x00ff0000},
-    {{{-50, 50}, {50, 50}}, 0x0080ff00},
-    {{{50, 50}, {50, -50}}, 0x008060ff},
-    {{{50, -50}, {-50, -50}}, 0x00ff8000},
+    {{-50, -50, -50, 50}, 0x00ff0000},
+    {{-50, 50, 50, 50}, 0x0080ff00},
+    {{50, 50, 50, -50}, 0x008060ff},
+    {{50, -50, -50, -50}, 0x00ff8000},
 };
 
 class WallTest : public ::testing::Test
@@ -59,25 +59,25 @@ TEST_F(WallTest, Test)
     t_pos cross_point;
     int color;
     wall = get_wall(0);
-    EXPECT_EQ(wall->line.p0.x, -50);
-    line.p0.x = 0;
-    line.p0.y = 0;
-    line.p1.x = -100;
-    line.p1.y = 0;
+    EXPECT_EQ(wall->line.x0, -50);
+    line.x0 = 0;
+    line.y0 = 0;
+    line.x1 = -100;
+    line.y1 = 0;
     EXPECT_TRUE(get_intersection(&wall->line, &line, &cross_point));
     EXPECT_EQ(cross_point.x, -50);
     EXPECT_EQ(cross_point.y, 0);
-    line.p0.x = 0;
-    line.p0.y = 0;
-    line.p1.x = -50;
-    line.p1.y = -50;
+    line.x0 = 0;
+    line.y0 = 0;
+    line.x1 = -50;
+    line.y1 = -50;
     EXPECT_TRUE(get_intersection(&wall->line, &line, &cross_point));
     EXPECT_EQ(cross_point.x, -50);
     EXPECT_EQ(cross_point.y, -50);
-    line.p0.x = -50;
-    line.p0.y = -100;
-    line.p1.x = -50;
-    line.p1.y = -50;
+    line.x0 = -50;
+    line.y0 = -100;
+    line.x1 = -50;
+    line.y1 = -50;
     EXPECT_TRUE(do_intersect(&wall->line, &line));
     EXPECT_TRUE(get_intersection(&wall->line, &line, &cross_point));
     EXPECT_EQ(cross_point.x, -50);

@@ -100,7 +100,7 @@ void draw_circle_s(t_img *img, t_pos *center, int radius, int color)
 
 void draw_line_s(t_img *data, t_line *line, int color)
 {
-    my_mlx_draw_line(data, line->p0.x, line->p0.y, line->p1.x, line->p1.y, color);
+    my_mlx_draw_line(data, line->x0, line->y0, line->x1, line->y1, color);
 }
 
 void put_pixel(t_img *img, t_camera *field, int x, int y, int color)
@@ -115,10 +115,15 @@ void put_pixel(t_img *img, t_camera *field, int x, int y, int color)
 
 void draw_line(t_img *img, t_camera *field, t_line *line, int color)
 {
-    t_pos_s p0, p1;
-    convert_to_screen(&line->p0, &p0, img, field);
-    convert_to_screen(&line->p1, &p1, img, field);
-    my_mlx_draw_line(img, p0.x, p0.y, p1.x, p1.y, color);
+    t_pos p1, p2;
+    t_pos_s ps0, ps1;
+    p1.x = line->x0;
+    p1.y = line->y0;
+    p2.x = line->x1;
+    p2.y = line->y1;
+    convert_to_screen(&p1, &ps0, img, field);
+    convert_to_screen(&p2, &ps1, img, field);
+    my_mlx_draw_line(img, ps0.x, ps0.y, ps1.x, ps1.y, color);
 }
 
 void draw_circle(t_img *img, t_camera *camera, t_pos *center, int radius, int color)
@@ -157,18 +162,18 @@ void draw_circle(t_img *img, t_camera *camera, t_pos *center, int radius, int co
 void draw_rect(t_img *img, t_camera *camera, t_rect *rect, int color)
 {
     t_line line;
-    line.p0.x = rect->x;
-    line.p0.y = rect->y;
-    line.p1.x = rect->x + rect->w;
-    line.p1.y = rect->y;
+    line.x0 = rect->x;
+    line.y0 = rect->y;
+    line.x1 = rect->x + rect->w;
+    line.y1 = rect->y;
     draw_line(img, camera, &line, color);
-    line.p0.x = rect->x + rect->w;
-    line.p0.y = rect->y + rect->h;
+    line.x0 = rect->x + rect->w;
+    line.y0 = rect->y + rect->h;
     draw_line(img, camera, &line, color);
-    line.p1.x = rect->x;
-    line.p1.y = rect->y + rect->h;
+    line.x1 = rect->x;
+    line.y1 = rect->y + rect->h;
     draw_line(img, camera, &line, color);
-    line.p0.x = rect->x;
-    line.p0.y = rect->y;
+    line.x0 = rect->x;
+    line.y0 = rect->y;
     draw_line(img, camera, &line, color);
 }

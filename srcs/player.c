@@ -79,10 +79,10 @@ void draw_player_view_line(t_vars *vars)
     t_line screen_line;
 
     double radian = (player->angle * PI) / 180.0;
-    screen_line.p0.x = player->x + VIEW_LENGTH * cos(radian - PI / 4.0);
-    screen_line.p0.y = player->y + VIEW_LENGTH * sin(radian - PI / 4.0);
-    screen_line.p1.x = player->x + VIEW_LENGTH * cos(radian + PI / 4.0);
-    screen_line.p1.y = player->y + VIEW_LENGTH * sin(radian + PI / 4.0);
+    screen_line.x0 = player->x + VIEW_LENGTH * cos(radian - PI / 4.0);
+    screen_line.y0 = player->y + VIEW_LENGTH * sin(radian - PI / 4.0);
+    screen_line.x1 = player->x + VIEW_LENGTH * cos(radian + PI / 4.0);
+    screen_line.y1 = player->y + VIEW_LENGTH * sin(radian + PI / 4.0);
     draw_line(&vars->img, &vars->camera, &screen_line, 0x00ffffff);
 
     draw_player_view(vars, &screen_line);
@@ -92,11 +92,12 @@ void draw_player_lines(t_vars *vars)
 {
     t_player *player = &vars->player;
     t_line way;
+    t_pos center;
 
-    way.p0.x = player->x;
-    way.p0.y = player->y;
+    center.x = player->x;
+    center.y = player->y;
     int radius = PLAYER_RADIUS;
-    draw_circle(&vars->img, &vars->camera, &way.p0, radius, PLAYER_COLOR);
+    draw_circle(&vars->img, &vars->camera, &center, radius, PLAYER_COLOR);
     draw_player_view_line(vars);
 }
 

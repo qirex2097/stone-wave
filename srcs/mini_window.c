@@ -40,8 +40,8 @@ void map_point_on_line(t_line *line, int w, int a, t_pos *point)
 {
     if (line == NULL || point == NULL || w == 0)
         return;
-    point->x = line->p0.x + (a * (line->p1.x - line->p0.x)) / w;
-    point->y = line->p0.y + (a * (line->p1.y - line->p0.y)) / w;
+    point->x = line->x0 + (a * (line->x1 - line->x0)) / w;
+    point->y = line->y0 + (a * (line->y1 - line->y0)) / w;
 }
 
 void draw_miniwindow(t_vars *vars, t_wall *wall, t_line *way, int sx)
@@ -62,7 +62,7 @@ void draw_miniwindow(t_vars *vars, t_wall *wall, t_line *way, int sx)
         draw_circle(&vars->img, &vars->camera, &cross_point, 3, color);
         // ミニウィンドウにラインを描画
         double cos_theta = cosine_angle(player_ray_x, player_ray_y, player->x, player->y, cross_point.x, cross_point.y);
-        double distance = sqrt(distance_squared(way->p0.x, way->p0.y, cross_point.x, cross_point.y)) * cos_theta;
+        double distance = sqrt(distance_squared(way->x0, way->y0, cross_point.x, cross_point.y)) * cos_theta;
         if (distance <= 0)
             return;
         int line_length = (int)(WALL_HEIGHT / distance);
@@ -74,13 +74,17 @@ void draw_player_view(t_vars *vars, t_line *screen)
 {
     t_player *player = &vars->player;
 
-    int sx = 0;
-    while (sx < vars->img2.w)
+    static int sx = 0;
+    // while (sx < vars->img2.w)
     {
         t_line ray;
-        ray.p0.x = player->x;
-        ray.p0.y = player->y;
-        map_point_on_line(screen, vars->img2.w, sx, &ray.p1);
+        t_pos p1;
+        ray.x0 = player->x;
+        ray.y0 = player->y;
+        map_point_on_line(screen, vars->img2.w, sx, &p1);
+        ray.x1 = p1.x;
+        ray.y1 = p1.y;
+        draw_line(&vars->img, &vars->camera, &ray, 0x00ffffff);
 
         int j = 0;
         t_wall *wall;
@@ -92,5 +96,8 @@ void draw_player_view(t_vars *vars, t_line *screen)
         }
 
         sx++;
+
+        if (vars->img2.w <= sx)
+            sx = 0;
     }
 }
