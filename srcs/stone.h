@@ -61,6 +61,11 @@ typedef struct
 
 typedef struct
 {
+    int x, y;
+} t_vec;
+
+typedef struct
+{
     int x0, y0, x1, y1;
 } t_line;
 
@@ -107,7 +112,9 @@ typedef struct
 typedef struct
 {
     char **data;
+    int x, y;
     int w, h;
+    int grid_size;
 } t_map;
 
 typedef struct
@@ -179,5 +186,6 @@ void draw_player_view(t_vars *vars, t_line *screen);
 t_map *init_map(int w, int h);
 void free_map(t_map *map);
 int draw_map(t_vars *);
+void ray_grid_intersection(t_map *map, t_pos ray_origin, t_vec ray_direction);
 
 #endif //_STONE_H_

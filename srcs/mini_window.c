@@ -1,6 +1,8 @@
-#include <mlx.h>
 #include <string.h>
+#include <stdlib.h>
 #include <math.h>
+#include <mlx.h>
+#include <stdio.h>
 #include "stone.h"
 
 #define MINIWINDOW_W 320
@@ -79,9 +81,10 @@ void draw_player_view(t_vars *vars, t_line *screen)
     {
         t_line ray;
         t_pos p1;
+        int width = vars->img2.w;
         ray.x0 = player->x;
         ray.y0 = player->y;
-        map_point_on_line(screen, vars->img2.w, sx, &p1);
+        map_point_on_line(screen, width, sx, &p1);
         ray.x1 = p1.x;
         ray.y1 = p1.y;
         draw_line(&vars->img, &vars->camera, &ray, 0x00ffffff);

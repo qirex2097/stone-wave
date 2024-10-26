@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include "stone.h"
 
+#define GRID_SIZE 100
+
 t_map *init_map(int w, int h)
 {
     int i, j;
@@ -33,8 +35,11 @@ t_map *init_map(int w, int h)
         i++;
     }
     map->data[h] = NULL;
+    map->x = 0;
+    map->y = 0;
     map->w = w;
     map->h = h;
+    map->grid_size = GRID_SIZE;
 
     // サンプルマップ
     i = 0;
@@ -105,4 +110,70 @@ int draw_map(t_vars *vars)
         i++;
     }
     return 0;
+}
+
+// 最大公約数を求める関数（整数比を簡約化するため）
+int gcd(int a, int b)
+{
+    while (b != 0)
+    {
+        int t = b;
+        b = a % b;
+        a = t;
+    }
+    return a;
+}
+
+// 光線と格子の交点を求めるDDAアルゴリズム
+void ray_grid_intersection(t_map *map, t_pos ray_origin, t_vec ray_direction)
+{
+    int grid_size = map->grid_size;
+
+    // 方向ベクトルの簡約化
+    int gcd_val = gcd(abs(ray_direction.x), abs(ray_direction.y));
+    int ray_direction_x = abs(ray_direction.x / gcd_val);
+    int ray_direction_y = abs(ray_direction.y / gcd_val);
+
+    // 現在位置
+    int current_pos_x, current_pos_y;
+    current_pos_x = ray_origin.x;
+    current_pos_y = ray_origin.y;
+
+    // どの方向に進むかを決定
+    int step_x = (ray_direction.x > 0) ? 1 : -1;
+    int step_y = (ray_direction.y > 0) ? 1 : -1;
+
+    printf("(%d,%d),dir=(%d,%d)\n", current_pos_x, current_pos_y,
+           step_x * ray_direction_x, step_y * ray_direction_y);
+
+    while (1)
+    {
+        // 次にXまたはY方向でセルの境界に到達するまでの距離
+        int t_max_x = (current_pos_x % grid_size == 0) ? grid_size : (step_x > 0) ? ((current_pos_x / grid_size + 1) * grid_size - current_pos_x)
+                                                                                  : (current_pos_x - ((current_pos_x - 1) / grid_size) * grid_size);
+        int t_max_y = (current_pos_y % grid_size == 0) ? grid_size : (step_y > 0) ? ((current_pos_y / grid_size + 1) * grid_size - current_pos_y)
+                                                                                  : (current_pos_y - ((current_pos_y - 1) / grid_size) * grid_size);
+
+        int dx, dy;
+        if (t_max_x * ray_direction_y < t_max_y * ray_direction_x)
+        {
+            dx = step_x * t_max_x;
+            dy = step_y * t_max_x * ray_direction_y / ray_direction_x;
+        }
+        else
+        {
+            dx = step_x * t_max_y * ray_direction_x / ray_direction_y;
+            dy = step_y * t_max_y;
+        }
+
+        current_pos_x += dx;
+        current_pos_y += dy;
+
+        printf("(%d,%d)\n", current_pos_x, current_pos_y);
+
+        if ((current_pos_x <= map->x || map->x + map->w * map->grid_size <= current_pos_x) ||
+            (current_pos_y <= map->y || map->y + map->h * map->grid_size <= current_pos_y))
+            break;
+    }
+    printf("----------------------------------------\n");
 }
