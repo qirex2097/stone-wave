@@ -124,7 +124,7 @@ int gcd(int a, int b)
 }
 
 // 光線と格子の交点を求めるDDAアルゴリズム
-void ray_grid_intersection(t_map *map, t_pos ray_origin, t_vec ray_direction)
+int ray_grid_intersection(t_map *map, t_pos ray_origin, t_vec ray_direction, t_pos *cross_point)
 {
     int grid_size = map->grid_size;
 
@@ -164,9 +164,13 @@ void ray_grid_intersection(t_map *map, t_pos ray_origin, t_vec ray_direction)
 
         current_pos_x += dx;
         current_pos_y += dy;
+        cross_point->x = current_pos_x;
+        cross_point->y = current_pos_y;
 
         if ((current_pos_x <= map->x || map->x + map->w * map->grid_size <= current_pos_x) ||
             (current_pos_y <= map->y || map->y + map->h * map->grid_size <= current_pos_y))
-            break;
+            return 0;
+        else
+            return 1;
     }
 }

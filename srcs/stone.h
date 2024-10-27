@@ -193,7 +193,7 @@ void draw_player_view(t_vars *vars, t_line *screen);
 t_map *init_map(int w, int h);
 void free_map(t_map *map);
 int draw_map(t_vars *);
-void ray_grid_intersection(t_map *map, t_pos ray_origin, t_vec ray_direction);
+int ray_grid_intersection(t_map *map, t_pos ray_origin, t_vec ray_direction, t_pos *cross_point);
 
 /* buff.c */
 void cleanup_buff(t_buff *buff);

@@ -54,10 +54,23 @@ void my_string_put(t_buff *buff, const char *str)
             exit(1);
         }
         buff->row_kazu = 0;
-        buff->rows[buff->row_kazu] = NULL;
     }
+
+    char **new_rows = realloc(buff->rows, sizeof(char *) * (buff->row_kazu + 2));
+    if (new_rows == NULL)
+    {
+        perror("Unable to allocate memory for rows");
+        exit(1);
+    }
+    buff->rows = new_rows;
+
+    buff->rows[buff->row_kazu] = strdup(str);
+    if (buff->rows[buff->row_kazu] == NULL)
+    {
+        perror("Unable to allocate memory for string duplication");
+        exit(1);
+    }
+
     buff->row_kazu++;
-    buff->rows = realloc(buff->rows, sizeof(char *) * buff->row_kazu);
-    buff->rows[buff->row_kazu - 1] = strdup(str);
     buff->rows[buff->row_kazu] = NULL;
 }
