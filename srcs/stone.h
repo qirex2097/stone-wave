@@ -119,6 +119,12 @@ typedef struct
 
 typedef struct
 {
+    int row_kazu;
+    char **rows;
+} t_buff;
+
+typedef struct
+{
     void *mlx;
     void *mlx_win;
     t_camera camera;
@@ -128,6 +134,7 @@ typedef struct
     t_mouse mouse;
     int mini_x, mini_y;
     t_map *map;
+    t_buff buff;
 } t_vars;
 
 /* main.c */
@@ -187,5 +194,10 @@ t_map *init_map(int w, int h);
 void free_map(t_map *map);
 int draw_map(t_vars *);
 void ray_grid_intersection(t_map *map, t_pos ray_origin, t_vec ray_direction);
+
+/* buff.c */
+void cleanup_buff(t_buff *buff);
+void draw_buff(t_vars *vars);
+void my_string_put(t_buff *buff, const char *str);
 
 #endif //_STONE_H_

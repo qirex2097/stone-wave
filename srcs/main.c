@@ -12,6 +12,8 @@ int render_next_frame(void *param)
 
     mlx_put_image_to_window(vars->mlx, vars->mlx_win, img->img, 0, 0);
 
+    cleanup_buff(&vars->buff);
+
     update_camera(vars);
     update_player(vars);
     update_wall(vars);
@@ -20,6 +22,7 @@ int render_next_frame(void *param)
     draw_player(vars);
     // draw_wall(vars);
     draw_map(vars);
+    draw_buff(vars);
 
     if (vars->mouse.button & SHOW_MINIWINDOW)
     {
@@ -95,29 +98,39 @@ static t_wall wall[] = {
 
 int main(void)
 {
-    t_vars vars;
+    t_vars *vars;
 
-    if (initialize_mlx(&vars) != 0)
+    vars = malloc(sizeof(t_vars));
+    if (vars == NULL)
     {
-        cleanup(&vars);
+        perror("Unable to allocate memory for vars");
+        exit(1);
+    }
+    memset(vars, 0, sizeof(t_vars));
+
+    if (initialize_mlx(vars) != 0)
+    {
+        cleanup(vars);
         exit(1);
     }
 
-    vars.map = init_map(10, 10);
-    init_camera(&vars.camera, 0, 0, 10 * 100, 10 * 100);
-    init_player(&vars.player, 5 * 100 + 50, 5 * 100 + 50);
+    vars->map = init_map(10, 10);
+    init_camera(&vars->camera, 0, 0, 10 * 100, 10 * 100);
+    init_player(&vars->player, 5 * 100 + 50, 5 * 100 + 50);
     init_wall(wall, sizeof(wall) / sizeof(t_wall));
-    init_mouse(&vars.mouse);
+    init_mouse(&vars->mouse);
 
-    mlx_do_key_autorepeatoff(vars.mlx);
-    mlx_hook(vars.mlx_win, KeyPress, KeyPressMask, key_press_handler, &vars);
-    mlx_hook(vars.mlx_win, KeyRelease, KeyReleaseMask, key_release_handler, &vars);
-    // mlx_hook(vars.mlx_win, MotionNotify, PointerMotionMask, mouse_move_handler, &vars);
-    mlx_hook(vars.mlx_win, ButtonPress, ButtonPressMask, mouse_down_handler, &vars);
-    // mlx_hook(vars.mlx_win, ButtonRelease, ButtonReleaseMask, mouse_up_handler, &vars);
-    mlx_loop_hook(vars.mlx, render_next_frame, &vars);
-    mlx_hook(vars.mlx_win, DestroyNotify, StructureNotifyMask, cross_button_handler, &vars);
-    mlx_loop(vars.mlx);
+    mlx_do_key_autorepeatoff(vars->mlx);
+    mlx_hook(vars->mlx_win, KeyPress, KeyPressMask, key_press_handler, vars);
+    mlx_hook(vars->mlx_win, KeyRelease, KeyReleaseMask, key_release_handler, vars);
+    // mlx_hook(vars->mlx_win, MotionNotify, PointerMotionMask, mouse_move_handler, vars);
+    mlx_hook(vars->mlx_win, ButtonPress, ButtonPressMask, mouse_down_handler, vars);
+    // mlx_hook(vars->mlx_win, ButtonRelease, ButtonReleaseMask, mouse_up_handler, vars);
+    mlx_loop_hook(vars->mlx, render_next_frame, vars);
+    mlx_hook(vars->mlx_win, DestroyNotify, StructureNotifyMask, cross_button_handler, vars);
+    mlx_loop(vars->mlx);
+
+    free(vars);
 
     return 0;
 }

@@ -1,3 +1,4 @@
+buff.o: srcs/buff.c srcs/stone.h
 camera.o: srcs/camera.c srcs/stone.h
 drawing.o: srcs/drawing.c srcs/stone.h
 drawing_utils.o: srcs/drawing_utils.c srcs/stone.h

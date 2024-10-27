@@ -29,3 +29,26 @@ TEST(MyLibraryTest2, FunctionReturnsExpectedValue)
     ray_grid_intersection(map, player_pos, dir);
     free(map);
 }
+
+TEST(BuffTest, Buff)
+{
+    const char *str[] = {"HELLO", "WORLD"};
+    t_buff buff;
+    buff.row_kazu = 0;
+    buff.rows = NULL;
+    my_string_put(&buff, str[0]);
+    my_string_put(&buff, str[1]);
+    EXPECT_EQ(buff.row_kazu, 2);
+
+    int i = 0;
+    char *p = buff.rows[i];
+    while (i < buff.row_kazu)
+    {
+        EXPECT_STREQ(buff.rows[i], str[i]);
+        i++;
+    }
+
+    cleanup_buff(&buff);
+    EXPECT_EQ(buff.row_kazu, 0);
+    EXPECT_TRUE(buff.rows == NULL);
+}

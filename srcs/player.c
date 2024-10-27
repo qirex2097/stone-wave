@@ -105,9 +105,11 @@ void render_player_info(t_vars *vars)
 {
     t_player *player = &vars->player;
 
+    my_string_put(&vars->buff, "HELLO");
+
     char str[100];
     snprintf(str, sizeof(str), "(%3d,%3d) %4d", player->x, player->y, player->angle);
-    mlx_string_put(vars->mlx, vars->mlx_win, 10, 10, TEXT_COLOR, str);
+    my_string_put(&vars->buff, str);
 }
 
 int draw_player(t_vars *vars)
