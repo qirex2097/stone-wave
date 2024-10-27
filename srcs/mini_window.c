@@ -108,6 +108,7 @@ void draw_player_view(t_vars *vars, t_line *screen)
     double radian = (player->angle * PI) / 180.0;
     t_pos origin, cross_point;
     t_vec direction;
+    int map_x1, map_y1, map_x2, map_y2;
     origin.x = player->x;
     origin.y = player->y;
     direction.x = (int)(VIEW_LENGTH * cos(radian));
@@ -116,18 +117,44 @@ void draw_player_view(t_vars *vars, t_line *screen)
     while (ray_grid_intersection(vars->map, origin, direction, &cross_point))
     {
         int color;
-        char str[100];
-        snprintf(str, sizeof(str), "%2d:(%d,%d)", i, cross_point.x, cross_point.y);
-        my_string_put(&vars->buff, str);
+
+        map_x1 = cross_point.x / vars->map->grid_size;
+        map_y1 = cross_point.y / vars->map->grid_size;
         if (cross_point.x % vars->map->grid_size == 0 && cross_point.y % vars->map->grid_size == 0)
+        {
+            map_x2 = map_x1 - 1;
+            map_y2 = map_y1 - 1;
             color = 0x00ffff00;
+        }
         else if (cross_point.x % vars->map->grid_size == 0)
+        {
+            map_x2 = map_x1 - 1;
+            map_y2 = map_y1;
             color = 0x00ff0000;
+        }
         else
+        {
+            map_x2 = map_x1;
+            map_y2 = map_y1 - 1;
             color = 0x0000ff00;
-        draw_circle(&vars->img, &vars->camera, &cross_point, 3, color);
+        }
+        // draw_circle(&vars->img, &vars->camera, &cross_point, 3, color);
         origin.x = cross_point.x;
         origin.y = cross_point.y;
+
+        char str[100];
+        snprintf(str, sizeof(str), "%2d:(%4d,%4d),map=(%d,%d)=%c,(%d,%d)=%c",
+                 i, cross_point.x, cross_point.y,
+                 map_x2, map_y2, vars->map->data[map_y2][map_x2],
+                 map_x1, map_y1, vars->map->data[map_y1][map_x1]);
+        my_string_put(&vars->buff, str);
+
+        if (vars->map->data[map_y2][map_x2] == '1' || vars->map->data[map_y1][map_x1] == '1')
+        {
+            draw_circle(&vars->img, &vars->camera, &cross_point, 3, color);
+            break;
+        }
+
         i++;
     }
 }
