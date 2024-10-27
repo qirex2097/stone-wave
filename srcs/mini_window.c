@@ -72,12 +72,15 @@ void draw_miniwindow(t_vars *vars, t_wall *wall, t_line *way, int sx)
     }
 }
 
+t_pos ray_wall_intersection(t_vars *vars, t_pos origin, t_vec direction);
+
 void draw_player_view(t_vars *vars, t_line *screen)
 {
     t_player *player = &vars->player;
 
     static int sx = 0;
-    // while (sx < vars->img2.w)
+    sx = 0;
+    while (sx < vars->img2.w)
     {
         t_line ray;
         t_pos p1;
@@ -87,32 +90,47 @@ void draw_player_view(t_vars *vars, t_line *screen)
         map_point_on_line(screen, width, sx, &p1);
         ray.x1 = p1.x;
         ray.y1 = p1.y;
-        draw_line(&vars->img, &vars->camera, &ray, 0x00ffffff);
+        // draw_line(&vars->img, &vars->camera, &ray, 0x00ffffff);
 
-#if 0
-        int j = 0;
-        t_wall *wall;
-        wall = get_wall(j);
-        while (wall)
+        t_pos origin, cross_point;
+        t_vec direction;
+        int color = 0x00ffffff;
+
+        double radian = (player->angle * PI) / 180.0;
+        origin.x = player->x;
+        origin.y = player->y;
+        direction.x = ray.x1 - ray.x0;
+        direction.y = ray.y1 - ray.y0;
+        cross_point = ray_wall_intersection(vars, origin, direction);
+        // draw_circle(&vars->img, &vars->camera, &cross_point, 3, 0x00ffffff);
+
+        if (cross_point.x % vars->map->grid_size == 0)
         {
-            draw_miniwindow(vars, wall, &ray, sx);
-            wall = get_wall(++j);
+            if (cross_point.y % vars->map->grid_size == 0)
+            {
+                char str[100];
+                snprintf(str, sizeof(str), "(%3d,%3d)", cross_point.x, cross_point.y);
+                my_string_put(&vars->buff, str);
+            }
+            color = 0x00800000;
         }
-#endif
+
+        // ミニウィンドウにラインを描画
+        double cos_theta = cosine_angle(ray.x1, ray.y1, ray.x0, ray.y0, cross_point.x, cross_point.y);
+        double distance = sqrt(distance_squared(ray.x0, ray.y0, cross_point.x, cross_point.y)) * cos_theta;
+        if (distance <= 0)
+            return;
+        int line_length = (int)(WALL_HEIGHT / distance);
+        my_mlx_draw_line(&vars->img2, sx, MINIWINDOW_H / 2 - line_length / 2, sx, MINIWINDOW_H / 2 + line_length / 2, color);
+
         sx++;
-
-        if (vars->img2.w <= sx)
-            sx = 0;
     }
+}
 
-    double radian = (player->angle * PI) / 180.0;
-    t_pos origin, cross_point;
-    t_vec direction;
+t_pos ray_wall_intersection(t_vars *vars, t_pos origin, t_vec direction)
+{
+    t_pos cross_point;
     int map_x1, map_y1, map_x2, map_y2;
-    origin.x = player->x;
-    origin.y = player->y;
-    direction.x = (int)(VIEW_LENGTH * cos(radian));
-    direction.y = (int)(VIEW_LENGTH * sin(radian));
     int i = 1;
     while (ray_grid_intersection(vars->map, origin, direction, &cross_point))
     {
@@ -124,19 +142,16 @@ void draw_player_view(t_vars *vars, t_line *screen)
         {
             map_x2 = map_x1 - 1;
             map_y2 = map_y1 - 1;
-            color = 0x00ffff00;
         }
         else if (cross_point.x % vars->map->grid_size == 0)
         {
             map_x2 = map_x1 - 1;
             map_y2 = map_y1;
-            color = 0x00ff0000;
         }
         else
         {
             map_x2 = map_x1;
             map_y2 = map_y1 - 1;
-            color = 0x0000ff00;
         }
         // draw_circle(&vars->img, &vars->camera, &cross_point, 3, color);
         origin.x = cross_point.x;
@@ -147,14 +162,11 @@ void draw_player_view(t_vars *vars, t_line *screen)
                  i, cross_point.x, cross_point.y,
                  map_x2, map_y2, vars->map->data[map_y2][map_x2],
                  map_x1, map_y1, vars->map->data[map_y1][map_x1]);
-        my_string_put(&vars->buff, str);
+        // my_string_put(&vars->buff, str);
 
         if (vars->map->data[map_y2][map_x2] == '1' || vars->map->data[map_y1][map_x1] == '1')
-        {
-            draw_circle(&vars->img, &vars->camera, &cross_point, 3, color);
             break;
-        }
-
         i++;
     }
+    return cross_point;
 }
