@@ -12,22 +12,22 @@ TEST(MyLibraryTest2, FunctionReturnsExpectedValue)
     t_vec dir = {3, 1};
     t_pos cross_point;
     // void ray_grid_intersection(t_map *map, t_pos ray_origin, t_vec ray_direction)
-    ray_grid_intersection(map, player_pos, dir, &cross_point);
+    find_next_grid_crossing(map, player_pos, dir, &cross_point);
     player_pos.x = 150;
     player_pos.y = 20;
     dir.x = -3;
     dir.y = 1;
-    ray_grid_intersection(map, player_pos, dir, &cross_point);
+    find_next_grid_crossing(map, player_pos, dir, &cross_point);
     player_pos.x = 100;
     player_pos.y = 920;
     dir.x = 0;
     dir.y = -1;
-    ray_grid_intersection(map, player_pos, dir, &cross_point);
+    find_next_grid_crossing(map, player_pos, dir, &cross_point);
     player_pos.x = 550;
     player_pos.y = 550;
     dir.x = -1;
     dir.y = -1;
-    ray_grid_intersection(map, player_pos, dir, &cross_point);
+    find_next_grid_crossing(map, player_pos, dir, &cross_point);
     free(map);
 }
 

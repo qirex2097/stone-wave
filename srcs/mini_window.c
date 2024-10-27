@@ -72,101 +72,62 @@ void draw_miniwindow(t_vars *vars, t_wall *wall, t_line *way, int sx)
     }
 }
 
-t_pos ray_wall_intersection(t_vars *vars, t_pos origin, t_vec direction);
+t_pos detect_ray_wall_intersection(t_vars *vars, t_pos origin, t_vec direction)
+{
+    t_pos cross_point = {0, 0};
+    while (find_next_grid_crossing(vars->map, origin, direction, &cross_point))
+    {
+        origin.x = cross_point.x;
+        origin.y = cross_point.y;
+        if (is_ray_hit_wall(vars->map, cross_point))
+            break;
+    }
+    return cross_point;
+}
+
+void draw_miniwindow_sub(t_vars *vars, t_line ray, t_pos cross_point, int sx, int color)
+{
+    double cos_theta = cosine_angle(ray.x1, ray.y1, ray.x0, ray.y0, cross_point.x, cross_point.y);
+    double distance = sqrt(distance_squared(ray.x0, ray.y0, cross_point.x, cross_point.y)) * cos_theta;
+    if (distance <= 0)
+        return;
+    int line_length = (int)(WALL_HEIGHT / distance);
+    my_mlx_draw_line(&vars->img2, sx, MINIWINDOW_H / 2 - line_length / 2, sx, MINIWINDOW_H / 2 + line_length / 2, color);
+}
 
 void draw_player_view(t_vars *vars, t_line *screen)
 {
     t_player *player = &vars->player;
 
-    static int sx = 0;
-    sx = 0;
+    int sx = 0;
     while (sx < vars->img2.w)
     {
-        t_line ray;
+        t_line view_ray;
         t_pos p1;
         int width = vars->img2.w;
-        ray.x0 = player->x;
-        ray.y0 = player->y;
         map_point_on_line(screen, width, sx, &p1);
-        ray.x1 = p1.x;
-        ray.y1 = p1.y;
-        // draw_line(&vars->img, &vars->camera, &ray, 0x00ffffff);
+        view_ray.x0 = player->x;
+        view_ray.y0 = player->y;
+        view_ray.x1 = p1.x;
+        view_ray.y1 = p1.y;
+        // draw_line(&vars->img, &vars->camera, &view_ray, 0x00ffffff);
 
         t_pos origin, cross_point;
         t_vec direction;
-        int color = 0x00ffffff;
 
         double radian = (player->angle * PI) / 180.0;
         origin.x = player->x;
         origin.y = player->y;
-        direction.x = ray.x1 - ray.x0;
-        direction.y = ray.y1 - ray.y0;
-        cross_point = ray_wall_intersection(vars, origin, direction);
+        direction.x = view_ray.x1 - view_ray.x0;
+        direction.y = view_ray.y1 - view_ray.y0;
+        cross_point = detect_ray_wall_intersection(vars, origin, direction);
         // draw_circle(&vars->img, &vars->camera, &cross_point, 3, 0x00ffffff);
 
-        if (cross_point.x % vars->map->grid_size == 0)
-        {
-            if (cross_point.y % vars->map->grid_size == 0)
-            {
-                char str[100];
-                snprintf(str, sizeof(str), "(%3d,%3d)", cross_point.x, cross_point.y);
-                my_string_put(&vars->buff, str);
-            }
-            color = 0x00800000;
-        }
+        int color;
+        color = get_wall_color(vars->map, cross_point);
 
-        // ミニウィンドウにラインを描画
-        double cos_theta = cosine_angle(ray.x1, ray.y1, ray.x0, ray.y0, cross_point.x, cross_point.y);
-        double distance = sqrt(distance_squared(ray.x0, ray.y0, cross_point.x, cross_point.y)) * cos_theta;
-        if (distance <= 0)
-            return;
-        int line_length = (int)(WALL_HEIGHT / distance);
-        my_mlx_draw_line(&vars->img2, sx, MINIWINDOW_H / 2 - line_length / 2, sx, MINIWINDOW_H / 2 + line_length / 2, color);
-
+        // draw a line at position sx
+        draw_miniwindow_sub(vars, view_ray, cross_point, sx, color);
         sx++;
     }
-}
-
-t_pos ray_wall_intersection(t_vars *vars, t_pos origin, t_vec direction)
-{
-    t_pos cross_point;
-    int map_x1, map_y1, map_x2, map_y2;
-    int i = 1;
-    while (ray_grid_intersection(vars->map, origin, direction, &cross_point))
-    {
-        int color;
-
-        map_x1 = cross_point.x / vars->map->grid_size;
-        map_y1 = cross_point.y / vars->map->grid_size;
-        if (cross_point.x % vars->map->grid_size == 0 && cross_point.y % vars->map->grid_size == 0)
-        {
-            map_x2 = map_x1 - 1;
-            map_y2 = map_y1 - 1;
-        }
-        else if (cross_point.x % vars->map->grid_size == 0)
-        {
-            map_x2 = map_x1 - 1;
-            map_y2 = map_y1;
-        }
-        else
-        {
-            map_x2 = map_x1;
-            map_y2 = map_y1 - 1;
-        }
-        // draw_circle(&vars->img, &vars->camera, &cross_point, 3, color);
-        origin.x = cross_point.x;
-        origin.y = cross_point.y;
-
-        char str[100];
-        snprintf(str, sizeof(str), "%2d:(%4d,%4d),map=(%d,%d)=%c,(%d,%d)=%c",
-                 i, cross_point.x, cross_point.y,
-                 map_x2, map_y2, vars->map->data[map_y2][map_x2],
-                 map_x1, map_y1, vars->map->data[map_y1][map_x1]);
-        // my_string_put(&vars->buff, str);
-
-        if (vars->map->data[map_y2][map_x2] == '1' || vars->map->data[map_y1][map_x1] == '1')
-            break;
-        i++;
-    }
-    return cross_point;
 }
