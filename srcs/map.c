@@ -153,11 +153,13 @@ int find_next_grid_crossing(t_map *map, t_pos ray_origin, t_vec ray_direction, t
         int dx, dy;
         if (t_max_x * ray_direction_y < t_max_y * ray_direction_x)
         {
+            // TODO ray_direction_x == 0の場合
             dx = step_x * t_max_x;
             dy = step_y * t_max_x * ray_direction_y / ray_direction_x;
         }
         else
         {
+            // TODO ray_direction_y == 0の場合
             dx = step_x * t_max_y * ray_direction_x / ray_direction_y;
             dy = step_y * t_max_y;
         }
@@ -209,7 +211,7 @@ int is_ray_hit_wall(t_map *map, t_pos cross_point)
     snprintf(str, sizeof(str), "(%4d,%4d),map=(%d,%d)=%c,(%d,%d)=%c",
              cross_point.x, cross_point.y,
              grids.x1, grids.y1, map->data[grids.y1][grids.x1],
-             grids.x0, grids.y0, map->data[grids.y0][grids.x1]);
+             grids.x0, grids.y0, map->data[grids.y0][grids.x0]);
     // my_string_put(&vars->buff, str);
 
     if (map->data[grids.y1][grids.x1] == '1' || map->data[grids.y0][grids.x0] == '1')
@@ -228,7 +230,7 @@ int get_wall_color(t_map *map, t_pos cross_point)
     {
         color = 0x00ffffff;
     }
-    if (cross_point.x % map->grid_size == 0)
+    else if (cross_point.x % map->grid_size == 0)
     {
         color = 0x00ff0000;
     }

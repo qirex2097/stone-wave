@@ -43,7 +43,7 @@ void draw_buff(t_vars *vars)
 
 void my_string_put(t_buff *buff, const char *str)
 {
-    if (buff == NULL)
+    if (buff == NULL || str == NULL)
         return;
     if (buff->rows == NULL)
     {

@@ -27,6 +27,9 @@ int init_mini_window(t_vars *vars)
 
 int render_mini_window(t_vars *vars)
 {
+    if (vars == NULL || vars->mlx == NULL || vars->mlx_win == NULL)
+        return -1;
+
     mlx_put_image_to_window(vars->mlx, vars->mlx_win, vars->img2.img, vars->mini_x, vars->mini_y);
     memset(vars->img2.addr, 0, MINIWINDOW_W * MINIWINDOW_H * (vars->img2.bits_per_pixel / 8));
 
@@ -38,12 +41,15 @@ int render_mini_window(t_vars *vars)
     return 0;
 }
 
-void map_point_on_line(t_line *line, int w, int a, t_pos *point)
+t_pos map_point_on_line(t_line *line, int w, int a)
 {
-    if (line == NULL || point == NULL || w == 0)
-        return;
-    point->x = line->x0 + (a * (line->x1 - line->x0)) / w;
-    point->y = line->y0 + (a * (line->y1 - line->y0)) / w;
+    if (line == NULL || w == 0)
+        return (t_pos){0, 0};
+
+    t_pos point;
+    point.x = line->x0 + (a * (line->x1 - line->x0)) / w;
+    point.y = line->y0 + (a * (line->y1 - line->y0)) / w;
+    return point;
 }
 
 void draw_miniwindow(t_vars *vars, t_wall *wall, t_line *way, int sx)
@@ -105,7 +111,7 @@ void draw_player_view(t_vars *vars, t_line *screen)
         t_line view_ray;
         t_pos p1;
         int width = vars->img2.w;
-        map_point_on_line(screen, width, sx, &p1);
+        p1 = map_point_on_line(screen, width, sx);
         view_ray.x0 = player->x;
         view_ray.y0 = player->y;
         view_ray.x1 = p1.x;

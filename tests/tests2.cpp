@@ -34,9 +34,7 @@ TEST(MyLibraryTest2, FunctionReturnsExpectedValue)
 TEST(BuffTest, Buff)
 {
     const char *str[] = {"HELLO", "WORLD"};
-    t_buff buff;
-    buff.row_kazu = 0;
-    buff.rows = NULL;
+    t_buff buff = {0, NULL};
     my_string_put(&buff, str[0]);
     my_string_put(&buff, str[1]);
     EXPECT_EQ(buff.row_kazu, 2);
@@ -48,6 +46,13 @@ TEST(BuffTest, Buff)
         EXPECT_STREQ(buff.rows[i], str[i]);
         i++;
     }
+
+    my_string_put(&buff, "");
+    EXPECT_EQ(buff.row_kazu, 3);
+    EXPECT_STREQ(buff.rows[2], "");
+
+    my_string_put(&buff, NULL);
+    EXPECT_EQ(buff.row_kazu, 3);
 
     cleanup_buff(&buff);
     EXPECT_EQ(buff.row_kazu, 0);
