@@ -78,20 +78,6 @@ void draw_miniwindow(t_vars *vars, t_wall *wall, t_line *way, int sx)
     }
 }
 
-t_pos detect_ray_wall_intersection(t_vars *vars, t_pos origin, t_vec direction)
-{
-    t_pos cross_point = {0, 0};
-    while (1)
-    {
-        cross_point = find_next_grid_crossing(origin, direction, vars->map->grid_size);
-        origin.x = cross_point.x;
-        origin.y = cross_point.y;
-        if (is_ray_hit_wall(vars->map, cross_point))
-            break;
-    }
-    return cross_point;
-}
-
 void draw_miniwindow_sub(t_vars *vars, t_line ray, t_pos cross_point, int sx, int color)
 {
     double cos_theta = cosine_angle(ray.x1, ray.y1, ray.x0, ray.y0, cross_point.x, cross_point.y);
@@ -127,7 +113,7 @@ void draw_player_view(t_vars *vars, t_line *screen)
         origin.y = player->y;
         direction.x = view_ray.x1 - view_ray.x0;
         direction.y = view_ray.y1 - view_ray.y0;
-        cross_point = detect_ray_wall_intersection(vars, origin, direction);
+        cross_point = detect_ray_wall_intersection(vars->map, origin, direction);
         // draw_circle(&vars->img, &vars->camera, &cross_point, 3, 0x00ffffff);
 
         int color;

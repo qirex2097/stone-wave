@@ -213,6 +213,20 @@ int is_ray_hit_wall(t_map *map, t_pos cross_point)
         return 0;
 }
 
+t_pos detect_ray_wall_intersection(t_map *map, t_pos origin, t_vec direction)
+{
+    t_pos cross_point = {0, 0};
+    while (1)
+    {
+        cross_point = find_next_grid_crossing(origin, direction, map->grid_size);
+        origin.x = cross_point.x;
+        origin.y = cross_point.y;
+        if (is_ray_hit_wall(map, cross_point))
+            break;
+    }
+    return cross_point;
+}
+
 int get_wall_color(t_map *map, t_pos cross_point)
 {
     int color = 0x00ffffff;
