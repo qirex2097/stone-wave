@@ -81,8 +81,9 @@ void draw_miniwindow(t_vars *vars, t_wall *wall, t_line *way, int sx)
 t_pos detect_ray_wall_intersection(t_vars *vars, t_pos origin, t_vec direction)
 {
     t_pos cross_point = {0, 0};
-    while (find_next_grid_crossing(vars->map, origin, direction, &cross_point))
+    while (1)
     {
+        cross_point = find_next_grid_crossing(origin, direction, vars->map->grid_size);
         origin.x = cross_point.x;
         origin.y = cross_point.y;
         if (is_ray_hit_wall(vars->map, cross_point))

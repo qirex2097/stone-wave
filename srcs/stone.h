@@ -188,7 +188,7 @@ void draw_player_view(t_vars *vars, t_line *screen);
 t_map *init_map(int w, int h);
 void free_map(t_map *map);
 int draw_map(t_vars *);
-int find_next_grid_crossing(t_map *map, t_pos ray_origin, t_vec ray_direction, t_pos *cross_point);
+t_pos find_next_grid_crossing(t_pos ray_origin, t_vec ray_direction, int grid_size);
 int is_ray_hit_wall(t_map *map, t_pos cross_point);
 int get_wall_color(t_map *map, t_pos cross_point);
 

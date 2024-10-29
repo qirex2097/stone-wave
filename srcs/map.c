@@ -124,10 +124,8 @@ int gcd(int a, int b)
 }
 
 // 光線と格子の交点を求めるDDAアルゴリズム
-int find_next_grid_crossing(t_map *map, t_pos ray_origin, t_vec ray_direction, t_pos *cross_point)
+t_pos find_next_grid_crossing(t_pos ray_origin, t_vec ray_direction, int grid_size)
 {
-    int grid_size = map->grid_size;
-
     // 方向ベクトルの簡約化
     int gcd_val = gcd(abs(ray_direction.x), abs(ray_direction.y));
     int ray_direction_x = abs(ray_direction.x / gcd_val);
@@ -142,39 +140,30 @@ int find_next_grid_crossing(t_map *map, t_pos ray_origin, t_vec ray_direction, t
     int step_x = (ray_direction.x > 0) ? 1 : -1;
     int step_y = (ray_direction.y > 0) ? 1 : -1;
 
-    while (1)
+    // 次にXまたはY方向でセルの境界に到達するまでの距離
+    int t_max_x = (current_pos_x % grid_size == 0) ? grid_size : (step_x > 0) ? ((current_pos_x / grid_size + 1) * grid_size - current_pos_x)
+                                                                              : (current_pos_x - ((current_pos_x - 1) / grid_size) * grid_size);
+    int t_max_y = (current_pos_y % grid_size == 0) ? grid_size : (step_y > 0) ? ((current_pos_y / grid_size + 1) * grid_size - current_pos_y)
+                                                                              : (current_pos_y - ((current_pos_y - 1) / grid_size) * grid_size);
+
+    int dx, dy;
+    if (t_max_x * ray_direction_y < t_max_y * ray_direction_x)
     {
-        // 次にXまたはY方向でセルの境界に到達するまでの距離
-        int t_max_x = (current_pos_x % grid_size == 0) ? grid_size : (step_x > 0) ? ((current_pos_x / grid_size + 1) * grid_size - current_pos_x)
-                                                                                  : (current_pos_x - ((current_pos_x - 1) / grid_size) * grid_size);
-        int t_max_y = (current_pos_y % grid_size == 0) ? grid_size : (step_y > 0) ? ((current_pos_y / grid_size + 1) * grid_size - current_pos_y)
-                                                                                  : (current_pos_y - ((current_pos_y - 1) / grid_size) * grid_size);
-
-        int dx, dy;
-        if (t_max_x * ray_direction_y < t_max_y * ray_direction_x)
-        {
-            // TODO ray_direction_x == 0の場合
-            dx = step_x * t_max_x;
-            dy = step_y * t_max_x * ray_direction_y / ray_direction_x;
-        }
-        else
-        {
-            // TODO ray_direction_y == 0の場合
-            dx = step_x * t_max_y * ray_direction_x / ray_direction_y;
-            dy = step_y * t_max_y;
-        }
-
-        current_pos_x += dx;
-        current_pos_y += dy;
-        cross_point->x = current_pos_x;
-        cross_point->y = current_pos_y;
-
-        if ((current_pos_x <= map->x || map->x + map->w * map->grid_size <= current_pos_x) ||
-            (current_pos_y <= map->y || map->y + map->h * map->grid_size <= current_pos_y))
-            return 0;
-        else
-            return 1;
+        // TODO ray_direction_x == 0の場合
+        dx = step_x * t_max_x;
+        dy = step_y * t_max_x * ray_direction_y / ray_direction_x;
     }
+    else
+    {
+        // TODO ray_direction_y == 0の場合
+        dx = step_x * t_max_y * ray_direction_x / ray_direction_y;
+        dy = step_y * t_max_y;
+    }
+
+    current_pos_x += dx;
+    current_pos_y += dy;
+
+    return (t_pos){current_pos_x, current_pos_y};
 }
 
 t_pair get_grid_at_position(t_map *map, t_pos cross_point)
@@ -213,6 +202,10 @@ int is_ray_hit_wall(t_map *map, t_pos cross_point)
              grids.x1, grids.y1, map->data[grids.y1][grids.x1],
              grids.x0, grids.y0, map->data[grids.y0][grids.x0]);
     // my_string_put(&vars->buff, str);
+
+    if ((cross_point.x <= map->x || map->x + map->w * map->grid_size <= cross_point.x) ||
+        (cross_point.y <= map->y || map->y + map->h * map->grid_size <= cross_point.y))
+        return 1;
 
     if (map->data[grids.y1][grids.x1] == '1' || map->data[grids.y0][grids.x0] == '1')
         return 1;
