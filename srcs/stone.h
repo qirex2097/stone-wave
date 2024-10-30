@@ -183,8 +183,8 @@ void free_map(t_map *map);
 int draw_map(t_vars *);
 t_pos find_next_grid_crossing(t_pos ray_origin, t_vec ray_direction, int grid_size);
 t_pos detect_ray_wall_intersection(t_map *map, t_pos origin, t_vec direction);
-int is_ray_hit_wall(t_map *map, t_pos cross_point);
-int get_wall_color(t_map *map, t_pos cross_point);
+int is_ray_hit_wall(t_map *map, t_pos cross_point, t_vec direction);
+int get_wall_color(t_map *map, t_pos cross_point, t_vec direction);
 
 /* buff.c */
 void init_buff();

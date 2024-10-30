@@ -166,7 +166,7 @@ t_pos find_next_grid_crossing(t_pos ray_origin, t_vec ray_direction, int grid_si
     return (t_pos){current_pos_x, current_pos_y};
 }
 
-t_pair get_grid_at_position(t_map *map, t_pos cross_point)
+t_pair get_grid_at_position(t_map *map, t_pos cross_point, t_vec direction)
 {
     int map_x1, map_y1, map_x2, map_y2;
     int grid_size = map->grid_size;
@@ -174,8 +174,17 @@ t_pair get_grid_at_position(t_map *map, t_pos cross_point)
     map_y1 = cross_point.y / grid_size;
     if (cross_point.x % grid_size == 0 && cross_point.y % grid_size == 0)
     {
-        map_x2 = map_x1 - 1;
-        map_y2 = map_y1 - 1;
+        if (direction.x * direction.y > 0)
+        {
+            map_x2 = map_x1 - 1;
+            map_y2 = map_y1 - 1;
+        }
+        else
+        {
+            map_x1 -= 1;
+            map_x2 = map_x1 + 1;
+            map_y2 = map_y1 - 1;
+        }
     }
     else if (cross_point.x % grid_size == 0)
     {
@@ -191,10 +200,10 @@ t_pair get_grid_at_position(t_map *map, t_pos cross_point)
     return (t_pair){map_x1, map_y1, map_x2, map_y2};
 }
 
-int is_ray_hit_wall(t_map *map, t_pos cross_point)
+int is_ray_hit_wall(t_map *map, t_pos cross_point, t_vec direction)
 {
     t_pair grids;
-    grids = get_grid_at_position(map, cross_point);
+    grids = get_grid_at_position(map, cross_point, direction);
 
     char str[100];
     snprintf(str, sizeof(str), "(%4d,%4d),map=(%d,%d)=%c,(%d,%d)=%c",
@@ -222,7 +231,7 @@ t_pos detect_ray_wall_intersection(t_map *map, t_pos origin, t_vec direction)
         origin.x = cross_point.x;
         origin.y = cross_point.y;
 
-        t_pair grids = get_grid_at_position(map, cross_point);
+        t_pair grids = get_grid_at_position(map, cross_point, direction);
         if (grids.x1 == 8 && grids.y1 == 0)
         {
             char str[256];
@@ -233,18 +242,18 @@ t_pos detect_ray_wall_intersection(t_map *map, t_pos origin, t_vec direction)
             my_string_put(str);
         }
 
-        if (is_ray_hit_wall(map, cross_point))
+        if (is_ray_hit_wall(map, cross_point, direction))
             break;
     }
     return cross_point;
 }
 
-int get_wall_color(t_map *map, t_pos cross_point)
+int get_wall_color(t_map *map, t_pos cross_point, t_vec direction)
 {
     int color = 0x00ffffff;
     t_pair grids;
 
-    grids = get_grid_at_position(map, cross_point);
+    grids = get_grid_at_position(map, cross_point, direction);
     if (cross_point.x % map->grid_size == 0 && cross_point.y % map->grid_size == 0)
     {
         color = 0x00ffffff;

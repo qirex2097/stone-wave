@@ -117,7 +117,7 @@ void draw_player_view(t_vars *vars, t_line *screen)
         draw_circle(&vars->img, &vars->camera, &cross_point, 3, 0x00ffffff);
 
         int color;
-        color = get_wall_color(vars->map, cross_point);
+        color = get_wall_color(vars->map, cross_point, direction);
 
         // draw a line at position sx
         int line_length = caliculate_line_length(view_ray, cross_point);
