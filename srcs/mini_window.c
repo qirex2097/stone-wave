@@ -21,6 +21,11 @@ int init_mini_window(t_vars *vars)
     vars->img2.w = MINIWINDOW_W;
     vars->img2.h = MINIWINDOW_H;
     vars->img2.addr = mlx_get_data_addr(vars->img2.img, &vars->img2.bits_per_pixel, &vars->img2.line_length, &vars->img2.endian);
+    if (vars->img2.addr == NULL)
+    {
+        mlx_destroy_image(vars->mlx, vars->img2.img);
+        return -1;
+    }
     memset(vars->img2.addr, 0, MINIWINDOW_W * MINIWINDOW_H * (vars->img2.bits_per_pixel / 8));
     return 0;
 }
@@ -52,6 +57,15 @@ t_pos map_point_on_line(t_line *line, int w, int a)
     return point;
 }
 
+int caliculate_line_length(t_line ray, t_pos cross_point)
+{
+    double cos_theta = cosine_angle(ray.x1, ray.y1, ray.x0, ray.y0, cross_point.x, cross_point.y);
+    double distance = sqrt(distance_squared(ray.x0, ray.y0, cross_point.x, cross_point.y)) * cos_theta;
+    if (distance <= 0.0001)
+        return -1;
+    return (int)(WALL_HEIGHT / distance);
+}
+
 void draw_miniwindow(t_vars *vars, t_wall *wall, t_line *way, int sx)
 {
     t_player *player = &vars->player;
@@ -68,24 +82,10 @@ void draw_miniwindow(t_vars *vars, t_wall *wall, t_line *way, int sx)
     {
         int color = wall->color;
         draw_circle(&vars->img, &vars->camera, &cross_point, 3, color);
-        // ミニウィンドウにラインを描画
-        double cos_theta = cosine_angle(player_ray_x, player_ray_y, player->x, player->y, cross_point.x, cross_point.y);
-        double distance = sqrt(distance_squared(way->x0, way->y0, cross_point.x, cross_point.y)) * cos_theta;
-        if (distance <= 0)
-            return;
-        int line_length = (int)(WALL_HEIGHT / distance);
+        // draw a line in miniwindow
+        int line_length = caliculate_line_length((t_line){player_ray_x, player_ray_y, player->x, player->y}, cross_point);
         my_mlx_draw_line(&vars->img2, sx, MINIWINDOW_H / 2 - line_length / 2, sx, MINIWINDOW_H / 2 + line_length / 2, color);
     }
-}
-
-void draw_miniwindow_sub(t_vars *vars, t_line ray, t_pos cross_point, int sx, int color)
-{
-    double cos_theta = cosine_angle(ray.x1, ray.y1, ray.x0, ray.y0, cross_point.x, cross_point.y);
-    double distance = sqrt(distance_squared(ray.x0, ray.y0, cross_point.x, cross_point.y)) * cos_theta;
-    if (distance <= 0)
-        return;
-    int line_length = (int)(WALL_HEIGHT / distance);
-    my_mlx_draw_line(&vars->img2, sx, MINIWINDOW_H / 2 - line_length / 2, sx, MINIWINDOW_H / 2 + line_length / 2, color);
 }
 
 void draw_player_view(t_vars *vars, t_line *screen)
@@ -114,13 +114,15 @@ void draw_player_view(t_vars *vars, t_line *screen)
         direction.x = view_ray.x1 - view_ray.x0;
         direction.y = view_ray.y1 - view_ray.y0;
         cross_point = detect_ray_wall_intersection(vars->map, origin, direction);
-        // draw_circle(&vars->img, &vars->camera, &cross_point, 3, 0x00ffffff);
+        draw_circle(&vars->img, &vars->camera, &cross_point, 3, 0x00ffffff);
 
         int color;
         color = get_wall_color(vars->map, cross_point);
 
         // draw a line at position sx
-        draw_miniwindow_sub(vars, view_ray, cross_point, sx, color);
+        int line_length = caliculate_line_length(view_ray, cross_point);
+        if (line_length > 0)
+            my_mlx_draw_line(&vars->img2, sx, MINIWINDOW_H / 2 - line_length / 2, sx, MINIWINDOW_H / 2 + line_length / 2, color);
         sx++;
     }
 }

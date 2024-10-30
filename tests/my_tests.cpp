@@ -5,7 +5,7 @@ extern "C"
 {
 #include "../srcs/stone.h" // テスト対象のヘッダー
     extern double cosine_angle(int x1, int y1, int x2, int y2, int x3, int y3);
-    extern void map_point_on_line(t_line *line, int w, int a, t_pos *point);
+    extern t_pos map_point_on_line(t_line *line, int w, int a);
     extern int do_intersect(t_line *line1, t_line *line2);
 
     int mlx_string_put(void *xvar, void *win, int x, int y, int color, char *string) { return 0; }

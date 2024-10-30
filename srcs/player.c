@@ -14,7 +14,7 @@ int init_player(t_player *player, int x, int y)
         return -1;
     player->x = x;
     player->y = y;
-    player->angle = 0;
+    player->angle = 344;
 
     return 0;
 }
@@ -105,11 +105,11 @@ void render_player_info(t_vars *vars)
 {
     t_player *player = &vars->player;
 
-    my_string_put(&vars->buff, "HELLO");
+    my_string_put("HELLO");
 
     char str[100];
     snprintf(str, sizeof(str), "(%3d,%3d) %4d", player->x, player->y, player->angle);
-    my_string_put(&vars->buff, str);
+    my_string_put(str);
 }
 
 int draw_player(t_vars *vars)

@@ -33,31 +33,3 @@ TEST(FindNextGridCrossingTest, FunctionReturnsExpectedValue)
     EXPECT_EQ(cross_point.x, 500);
     EXPECT_EQ(cross_point.y, 500);
 }
-
-TEST(BuffTest, Buff)
-{
-    const char *str[] = {"HELLO", "WORLD"};
-    t_buff buff = {0, NULL};
-    my_string_put(&buff, str[0]);
-    my_string_put(&buff, str[1]);
-    EXPECT_EQ(buff.row_kazu, 2);
-
-    int i = 0;
-    char *p = buff.rows[i];
-    while (i < buff.row_kazu)
-    {
-        EXPECT_STREQ(buff.rows[i], str[i]);
-        i++;
-    }
-
-    my_string_put(&buff, "");
-    EXPECT_EQ(buff.row_kazu, 3);
-    EXPECT_STREQ(buff.rows[2], "");
-
-    my_string_put(&buff, NULL);
-    EXPECT_EQ(buff.row_kazu, 3);
-
-    cleanup_buff(&buff);
-    EXPECT_EQ(buff.row_kazu, 0);
-    EXPECT_TRUE(buff.rows == NULL);
-}

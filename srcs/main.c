@@ -12,7 +12,7 @@ int render_next_frame(void *param)
 
     mlx_put_image_to_window(vars->mlx, vars->mlx_win, img->img, 0, 0);
 
-    cleanup_buff(&vars->buff);
+    cleanup_buff();
 
     update_camera(vars);
     update_player(vars);
@@ -86,6 +86,7 @@ int initialize_mlx(t_vars *vars)
         perror("Unable to initialize mini window");
         return -1;
     }
+    init_buff();
     return 0;
 }
 

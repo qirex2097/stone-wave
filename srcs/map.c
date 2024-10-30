@@ -201,7 +201,7 @@ int is_ray_hit_wall(t_map *map, t_pos cross_point)
              cross_point.x, cross_point.y,
              grids.x1, grids.y1, map->data[grids.y1][grids.x1],
              grids.x0, grids.y0, map->data[grids.y0][grids.x0]);
-    // my_string_put(&vars->buff, str);
+    // my_string_put(str);
 
     if ((cross_point.x <= map->x || map->x + map->w * map->grid_size <= cross_point.x) ||
         (cross_point.y <= map->y || map->y + map->h * map->grid_size <= cross_point.y))
@@ -221,6 +221,18 @@ t_pos detect_ray_wall_intersection(t_map *map, t_pos origin, t_vec direction)
         cross_point = find_next_grid_crossing(origin, direction, map->grid_size);
         origin.x = cross_point.x;
         origin.y = cross_point.y;
+
+        t_pair grids = get_grid_at_position(map, cross_point);
+        if (grids.x1 == 8 && grids.y1 == 0)
+        {
+            char str[256];
+            snprintf(str, sizeof(str), "(%d,%d),(%d,%d)", grids.x0, grids.y0, grids.x1, grids.y1);
+            my_string_put(str);
+            snprintf(str, sizeof(str), "origin=(%d,%d),dire=(%d,%d)",
+                     origin.x, origin.y, direction.x, direction.y);
+            my_string_put(str);
+        }
+
         if (is_ray_hit_wall(map, cross_point))
             break;
     }
