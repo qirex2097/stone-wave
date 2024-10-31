@@ -190,11 +190,19 @@ t_pair get_grid_at_position(t_map *map, t_pos cross_point, t_vec direction)
     {
         map_x2 = map_x1 - 1;
         map_y2 = map_y1;
+        if (map->data[map_y2][map_x2] != '0')
+            return (t_pair){map_x1, map_y1, map_x2, map_y2};
+        else
+            return (t_pair){map_x2, map_y2, map_x1, map_y1};
     }
     else
     {
         map_x2 = map_x1;
         map_y2 = map_y1 - 1;
+        if (map->data[map_y2][map_x2] != '0')
+            return (t_pair){map_x1, map_y1, map_x2, map_y2};
+        else
+            return (t_pair){map_x2, map_y2, map_x1, map_y1};
     }
 
     return (t_pair){map_x1, map_y1, map_x2, map_y2};
@@ -202,24 +210,33 @@ t_pair get_grid_at_position(t_map *map, t_pos cross_point, t_vec direction)
 
 int is_ray_hit_wall(t_map *map, t_pos cross_point, t_vec direction)
 {
-    t_pair grids;
-    grids = get_grid_at_position(map, cross_point, direction);
-
-    char str[100];
-    snprintf(str, sizeof(str), "(%4d,%4d),map=(%d,%d)=%c,(%d,%d)=%c",
-             cross_point.x, cross_point.y,
-             grids.x1, grids.y1, map->data[grids.y1][grids.x1],
-             grids.x0, grids.y0, map->data[grids.y0][grids.x0]);
-    // my_string_put(str);
-
+    if (cross_point.x % map->grid_size != 0 && cross_point.y % map->grid_size != 0)
+        return 0;
     if ((cross_point.x <= map->x || map->x + map->w * map->grid_size <= cross_point.x) ||
         (cross_point.y <= map->y || map->y + map->h * map->grid_size <= cross_point.y))
         return 1;
 
-    if (map->data[grids.y1][grids.x1] == '1' || map->data[grids.y0][grids.x0] == '1')
-        return 1;
-    else
-        return 0;
+    int map_x, map_y;
+    map_x = (cross_point.x - map->x) / map->grid_size;
+    map_y = (cross_point.y - map->y) / map->grid_size;
+    if (cross_point.x % map->grid_size == 0 && cross_point.y % map->grid_size == 0)
+    {
+        if (map->data[map_y][map_x] != '0' || map->data[map_y][map_x - 1] != '0' ||
+            map->data[map_y - 1][map_x] != '0' || map->data[map_y - 1][map_x - 1] != '0')
+            return 1;
+    }
+    else if (cross_point.x % map->grid_size == 0)
+    {
+        if (map->data[map_y][map_x] != '0' || map->data[map_y][map_x - 1] != '0')
+            return 1;
+    }
+    else if (cross_point.y % map->grid_size == 0)
+    {
+        if (map->data[map_y][map_x] != '0' || map->data[map_y - 1][map_x] != '0')
+            return 1;
+    }
+
+    return 0;
 }
 
 t_pos detect_ray_wall_intersection(t_map *map, t_pos origin, t_vec direction)
