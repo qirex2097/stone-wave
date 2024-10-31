@@ -166,6 +166,11 @@ t_pos find_next_grid_crossing(t_pos ray_origin, t_vec ray_direction, int grid_si
     return (t_pos){current_pos_x, current_pos_y};
 }
 
+int is_not_space(t_map *map, int map_x, int map_y)
+{
+    return map_x < 0 || map_y < 0 || map_x >= map->w || map_y >= map->h || map->data[map_y][map_x] != '0';
+}
+
 t_pair get_grid_at_position(t_map *map, t_pos cross_point, t_vec direction)
 {
     int map_x1, map_y1, map_x2, map_y2;
@@ -190,7 +195,7 @@ t_pair get_grid_at_position(t_map *map, t_pos cross_point, t_vec direction)
     {
         map_x2 = map_x1 - 1;
         map_y2 = map_y1;
-        if (map->data[map_y2][map_x2] != '0')
+        if (is_not_space(map, map_x2, map_y2))
             return (t_pair){map_x1, map_y1, map_x2, map_y2};
         else
             return (t_pair){map_x2, map_y2, map_x1, map_y1};
@@ -199,7 +204,7 @@ t_pair get_grid_at_position(t_map *map, t_pos cross_point, t_vec direction)
     {
         map_x2 = map_x1;
         map_y2 = map_y1 - 1;
-        if (map->data[map_y2][map_x2] != '0')
+        if (is_not_space(map, map_x2, map_y2))
             return (t_pair){map_x1, map_y1, map_x2, map_y2};
         else
             return (t_pair){map_x2, map_y2, map_x1, map_y1};
@@ -208,7 +213,7 @@ t_pair get_grid_at_position(t_map *map, t_pos cross_point, t_vec direction)
     return (t_pair){map_x1, map_y1, map_x2, map_y2};
 }
 
-int is_ray_hit_wall(t_map *map, t_pos cross_point, t_vec direction)
+int is_ray_hit_wall(t_map *map, t_pos cross_point)
 {
     if (cross_point.x % map->grid_size != 0 && cross_point.y % map->grid_size != 0)
         return 0;
@@ -221,18 +226,18 @@ int is_ray_hit_wall(t_map *map, t_pos cross_point, t_vec direction)
     map_y = (cross_point.y - map->y) / map->grid_size;
     if (cross_point.x % map->grid_size == 0 && cross_point.y % map->grid_size == 0)
     {
-        if (map->data[map_y][map_x] != '0' || map->data[map_y][map_x - 1] != '0' ||
-            map->data[map_y - 1][map_x] != '0' || map->data[map_y - 1][map_x - 1] != '0')
+        if (is_not_space(map, map_x, map_y) || is_not_space(map, map_x - 1, map_y) ||
+            is_not_space(map, map_x, map_y - 1) || is_not_space(map, map_x - 1, map_y - 1))
             return 1;
     }
     else if (cross_point.x % map->grid_size == 0)
     {
-        if (map->data[map_y][map_x] != '0' || map->data[map_y][map_x - 1] != '0')
+        if (is_not_space(map, map_x, map_y) || is_not_space(map, map_x - 1, map_y))
             return 1;
     }
     else if (cross_point.y % map->grid_size == 0)
     {
-        if (map->data[map_y][map_x] != '0' || map->data[map_y - 1][map_x] != '0')
+        if (is_not_space(map, map_x, map_y) || is_not_space(map, map_x, map_y - 1))
             return 1;
     }
 
@@ -248,18 +253,7 @@ t_pos detect_ray_wall_intersection(t_map *map, t_pos origin, t_vec direction)
         origin.x = cross_point.x;
         origin.y = cross_point.y;
 
-        t_pair grids = get_grid_at_position(map, cross_point, direction);
-        if (grids.x1 == 8 && grids.y1 == 0)
-        {
-            char str[256];
-            snprintf(str, sizeof(str), "(%d,%d),(%d,%d)", grids.x0, grids.y0, grids.x1, grids.y1);
-            my_string_put(str);
-            snprintf(str, sizeof(str), "origin=(%d,%d),dire=(%d,%d)",
-                     origin.x, origin.y, direction.x, direction.y);
-            my_string_put(str);
-        }
-
-        if (is_ray_hit_wall(map, cross_point, direction))
+        if (is_ray_hit_wall(map, cross_point))
             break;
     }
     return cross_point;
@@ -267,13 +261,21 @@ t_pos detect_ray_wall_intersection(t_map *map, t_pos origin, t_vec direction)
 
 int get_wall_color(t_map *map, t_pos cross_point, t_vec direction)
 {
-    int color = 0x00ffffff;
-    t_pair grids;
+    int color;
 
-    grids = get_grid_at_position(map, cross_point, direction);
     if (cross_point.x % map->grid_size == 0 && cross_point.y % map->grid_size == 0)
     {
-        color = 0x00ffffff;
+        int map_x, map_y;
+        map_x = (cross_point.x - map->x) / map->grid_size;
+        map_y = (cross_point.y - map->y) / map->grid_size;
+        if (is_not_space(map, map_x, map_y) && is_not_space(map, map_x, map_y - 1))
+        {
+            color = 0x00ff0000;
+        }
+        else
+        {
+            color = 0x0000ff00;
+        }
     }
     else if (cross_point.x % map->grid_size == 0)
     {

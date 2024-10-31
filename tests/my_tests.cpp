@@ -11,6 +11,9 @@ extern "C"
     int mlx_string_put(void *xvar, void *win, int x, int y, int color, char *string) { return 0; }
     void draw_miniwindow(t_vars *vars, t_wall *wall, t_line *way, int sx) {}
     void draw_player_view(t_vars *vars, t_line *screen) {}
+
+    /* map.c */
+    int is_not_space(t_map *map, int map_x, int map_y);
 }
 
 TEST(MyLibraryTest, FunctionReturnsExpectedValue)
@@ -86,23 +89,34 @@ TEST_F(WallTest, Test)
 
 class MapTest : public ::testing::Test
 {
+public:
+    t_map *map;
+
 protected:
     void SetUp() override
     {
+        map = init_map(10, 10);
     }
 
     void TearDown() override
     {
+        free_map(map);
     }
 };
 
 TEST_F(MapTest, Test)
 {
-    t_map *map;
-    map = init_map(10, 10);
     EXPECT_TRUE(map);
     EXPECT_STREQ(map->data[0], "1111111111");
     EXPECT_STREQ(map->data[2], "1000000001");
     EXPECT_STREQ(map->data[10 - 1], "1111111111");
-    free_map(map);
+}
+
+TEST_F(MapTest, Wall)
+{
+    EXPECT_TRUE(is_not_space(map, 0, 0));
+    EXPECT_TRUE(is_not_space(map, 0, 1));
+    EXPECT_TRUE(is_not_space(map, 1, 1));
+    EXPECT_TRUE(is_not_space(map, -1, 4));
+    EXPECT_TRUE(is_not_space(map, 5, -1));
 }
