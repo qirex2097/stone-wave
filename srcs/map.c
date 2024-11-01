@@ -215,7 +215,9 @@ t_pair get_grid_at_position(t_map *map, t_pos cross_point, t_vec direction)
 
 int is_ray_hit_wall(t_map *map, t_pos cross_point)
 {
-    if (cross_point.x % map->grid_size != 0 && cross_point.y % map->grid_size != 0)
+    const int grid_x = cross_point.x % map->grid_size;
+    const int grid_y = cross_point.y % map->grid_size;
+    if (grid_x != 0 && grid_y != 0)
         return 0;
     if ((cross_point.x <= map->x || map->x + map->w * map->grid_size <= cross_point.x) ||
         (cross_point.y <= map->y || map->y + map->h * map->grid_size <= cross_point.y))
@@ -224,18 +226,18 @@ int is_ray_hit_wall(t_map *map, t_pos cross_point)
     int map_x, map_y;
     map_x = (cross_point.x - map->x) / map->grid_size;
     map_y = (cross_point.y - map->y) / map->grid_size;
-    if (cross_point.x % map->grid_size == 0 && cross_point.y % map->grid_size == 0)
+    if (grid_x == 0 && grid_y == 0)
     {
         if (is_not_space(map, map_x, map_y) || is_not_space(map, map_x - 1, map_y) ||
             is_not_space(map, map_x, map_y - 1) || is_not_space(map, map_x - 1, map_y - 1))
             return 1;
     }
-    else if (cross_point.x % map->grid_size == 0)
+    else if (grid_x == 0)
     {
         if (is_not_space(map, map_x, map_y) || is_not_space(map, map_x - 1, map_y))
             return 1;
     }
-    else if (cross_point.y % map->grid_size == 0)
+    else if (grid_y == 0)
     {
         if (is_not_space(map, map_x, map_y) || is_not_space(map, map_x, map_y - 1))
             return 1;
