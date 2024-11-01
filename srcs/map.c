@@ -88,6 +88,8 @@ void free_map(t_map *map)
 
 int draw_map(t_vars *vars)
 {
+    if (vars == NULL || vars->map == NULL)
+        return 0;
     t_map *map = vars->map;
     int i, j;
     i = 0;
@@ -99,9 +101,9 @@ int draw_map(t_vars *vars)
             if (map->data[i][j] == '1')
             {
                 t_rect rect;
-                rect.x = j * 100;
-                rect.y = i * 100;
-                rect.w = rect.h = 100;
+                rect.x = j * map->grid_size;
+                rect.y = i * map->grid_size;
+                rect.w = rect.h = map->grid_size;
                 draw_rect(&vars->img, &vars->camera, &rect, 0x00ff4080);
             }
             j++;
@@ -149,15 +151,31 @@ t_pos find_next_grid_crossing(t_pos ray_origin, t_vec ray_direction, int grid_si
     int dx, dy;
     if (t_max_x * ray_direction_y < t_max_y * ray_direction_x)
     {
-        // TODO ray_direction_x == 0の場合
-        dx = step_x * t_max_x;
-        dy = step_y * t_max_x * ray_direction_y / ray_direction_x;
+        if (ray_direction_x == 0)
+        {
+            dx = 0;
+            dy = step_y * grid_size;
+        }
+        else
+        {
+
+            dx = step_x * t_max_x;
+            dy = step_y * t_max_x * ray_direction_y / ray_direction_x;
+        }
     }
     else
     {
-        // TODO ray_direction_y == 0の場合
-        dx = step_x * t_max_y * ray_direction_x / ray_direction_y;
-        dy = step_y * t_max_y;
+        if (ray_direction_y == 0)
+        {
+            dx = step_x * grid_size;
+            dy = 0;
+        }
+        else
+        {
+
+            dx = step_x * t_max_y * ray_direction_x / ray_direction_y;
+            dy = step_y * t_max_y;
+        }
     }
 
     current_pos_x += dx;
@@ -261,33 +279,22 @@ t_pos detect_ray_wall_intersection(t_map *map, t_pos origin, t_vec direction)
     return cross_point;
 }
 
+int is_corner_wall(t_map *map, int map_x, int map_y)
+{
+    return (is_not_space(map, map_x, map_y) && is_not_space(map, map_x, map_y - 1)) ||
+           (is_not_space(map, map_x - 1, map_y) && is_not_space(map, map_x - 1, map_y - 1));
+}
+
 int get_wall_color(t_map *map, t_pos cross_point, t_vec direction)
 {
-    int color;
+    const int VERTICAL_WALL_COLOR = 0x00ff0000;
+    const int HORIZONTAL_WALL_COLOR = 0x0000ff00;
+    int map_x, map_y;
+    map_x = (cross_point.x - map->x) / map->grid_size;
+    map_y = (cross_point.y - map->y) / map->grid_size;
 
     if (cross_point.x % map->grid_size == 0 && cross_point.y % map->grid_size == 0)
-    {
-        int map_x, map_y;
-        map_x = (cross_point.x - map->x) / map->grid_size;
-        map_y = (cross_point.y - map->y) / map->grid_size;
-        if ((is_not_space(map, map_x, map_y) && is_not_space(map, map_x, map_y - 1)) ||
-            (is_not_space(map, map_x - 1, map_y) && is_not_space(map, map_x - 1, map_y - 1)))
-        {
-            color = 0x00ff0000;
-        }
-        else
-        {
-            color = 0x0000ff00;
-        }
-    }
-    else if (cross_point.x % map->grid_size == 0)
-    {
-        color = 0x00ff0000;
-    }
-    else
-    {
-        color = 0x0000ff00;
-    }
+        return is_corner_wall(map, map_x, map_y) ? VERTICAL_WALL_COLOR : HORIZONTAL_WALL_COLOR;
 
-    return color;
+    return (cross_point.x % map->grid_size == 0) ? VERTICAL_WALL_COLOR : HORIZONTAL_WALL_COLOR;
 }

@@ -192,7 +192,8 @@ void draw_buff(t_vars *vars)
     while (i < buff->row_kazu)
     {
         str = buff->rows[i];
-        mlx_string_put(vars->mlx, vars->mlx_win, offset_x, offset_y + i * 10, color, str);
+        if (str)
+            mlx_string_put(vars->mlx, vars->mlx_win, offset_x, offset_y + i * 10, color, str);
         i++;
     }
 }

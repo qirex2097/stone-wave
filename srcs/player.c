@@ -8,7 +8,7 @@
 #define PLAYER_COLOR 0x00ff0000
 #define TEXT_COLOR 0x00ffffff
 #define DEFAULT_VIEW_LENGTH 300
-#define VIEW_ANGLE (PI / 4.0)
+#define DEFAULT_VIEW_ANGLE 45
 
 int init_player(t_player *player, int x, int y)
 {
@@ -72,21 +72,18 @@ int update_player(t_vars *vars)
     return 0;
 }
 
-void draw_player_view_line(t_vars *vars)
+t_line calculate_screen_line(t_vars *vars)
 {
     t_player *player = &vars->player;
-    t_line way, player_ray;
-
     t_line screen_line;
 
-    double radian = (player->angle * PI) / 180.0;
-    screen_line.x0 = player->x + DEFAULT_VIEW_LENGTH * cos(radian - VIEW_ANGLE);
-    screen_line.y0 = player->y + DEFAULT_VIEW_LENGTH * sin(radian - VIEW_ANGLE);
-    screen_line.x1 = player->x + DEFAULT_VIEW_LENGTH * cos(radian + VIEW_ANGLE);
-    screen_line.y1 = player->y + DEFAULT_VIEW_LENGTH * sin(radian + VIEW_ANGLE);
-    draw_line(&vars->img, &vars->camera, &screen_line, 0x00ffffff);
+    int angle = DEFAULT_VIEW_ANGLE;
+    screen_line.x0 = player->x + DEFAULT_VIEW_LENGTH * cos((player->angle - angle) * PI / 180.0);
+    screen_line.y0 = player->y + DEFAULT_VIEW_LENGTH * sin((player->angle - angle) * PI / 180.0);
+    screen_line.x1 = player->x + DEFAULT_VIEW_LENGTH * cos((player->angle + angle) * PI / 180.0);
+    screen_line.y1 = player->y + DEFAULT_VIEW_LENGTH * sin((player->angle + angle) * PI / 180.0);
 
-    draw_player_view(vars, &screen_line);
+    return screen_line;
 }
 
 void draw_player_lines(t_vars *vars)
@@ -99,7 +96,6 @@ void draw_player_lines(t_vars *vars)
     center.y = player->y;
     int radius = PLAYER_RADIUS;
     draw_circle(&vars->img, &vars->camera, &center, radius, PLAYER_COLOR);
-    draw_player_view_line(vars);
 }
 
 void render_player_info(t_vars *vars)
@@ -115,8 +111,11 @@ void render_player_info(t_vars *vars)
 
 int draw_player(t_vars *vars)
 {
+    t_line screen_line;
     draw_player_lines(vars);
+    screen_line = calculate_screen_line(vars);
+    draw_line(&vars->img, &vars->camera, &screen_line, 0x00ffffff); // screen_line
+    draw_player_view(vars, &screen_line);                           // mini_window.c
     render_player_info(vars);
-
     return 0;
 }

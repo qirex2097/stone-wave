@@ -70,6 +70,8 @@ int calculate_line_length(t_line ray, t_pos cross_point)
 
 void draw_miniwindow(t_vars *vars, t_wall *wall, t_line *way, int sx)
 {
+    if (vars == NULL || wall == NULL || way == NULL)
+        return;
     t_player *player = &vars->player;
     t_pos cross_point;
     t_line way3;
