@@ -268,7 +268,8 @@ int get_wall_color(t_map *map, t_pos cross_point, t_vec direction)
         int map_x, map_y;
         map_x = (cross_point.x - map->x) / map->grid_size;
         map_y = (cross_point.y - map->y) / map->grid_size;
-        if (is_not_space(map, map_x, map_y) && is_not_space(map, map_x, map_y - 1))
+        if ((is_not_space(map, map_x, map_y) && is_not_space(map, map_x, map_y - 1)) ||
+            (is_not_space(map, map_x - 1, map_y) && is_not_space(map, map_x - 1, map_y - 1)))
         {
             color = 0x00ff0000;
         }

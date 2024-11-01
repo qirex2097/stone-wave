@@ -10,6 +10,8 @@
 #define VIEW_LENGTH 300
 #define WALL_HEIGHT 10000
 
+#define SEGMENT_SCALE_FACTOR 5
+
 int init_mini_window(t_vars *vars)
 {
     if (vars == NULL || vars->mlx == NULL)
@@ -57,7 +59,7 @@ t_pos map_point_on_line(t_line *line, int w, int a)
     return point;
 }
 
-int caliculate_line_length(t_line ray, t_pos cross_point)
+int calculate_line_length(t_line ray, t_pos cross_point)
 {
     double cos_theta = cosine_angle(ray.x1, ray.y1, ray.x0, ray.y0, cross_point.x, cross_point.y);
     double distance = sqrt(distance_squared(ray.x0, ray.y0, cross_point.x, cross_point.y)) * cos_theta;
@@ -76,14 +78,14 @@ void draw_miniwindow(t_vars *vars, t_wall *wall, t_line *way, int sx)
     int player_ray_x = player->x + (int)(VIEW_LENGTH * cos(radian));
     int player_ray_y = player->y + (int)(VIEW_LENGTH * sin(radian));
 
-    scale_segment(way, 5, &way3);
+    scale_segment(way, SEGMENT_SCALE_FACTOR, &way3);
 
     if (get_intersection(&wall->line, &way3, &cross_point))
     {
         int color = wall->color;
         draw_circle(&vars->img, &vars->camera, &cross_point, 3, color);
         // draw a line in miniwindow
-        int line_length = caliculate_line_length((t_line){player_ray_x, player_ray_y, player->x, player->y}, cross_point);
+        int line_length = calculate_line_length((t_line){player_ray_x, player_ray_y, player->x, player->y}, cross_point);
         my_mlx_draw_line(&vars->img2, sx, MINIWINDOW_H / 2 - line_length / 2, sx, MINIWINDOW_H / 2 + line_length / 2, color);
     }
 }
@@ -120,7 +122,7 @@ void draw_player_view(t_vars *vars, t_line *screen)
         color = get_wall_color(vars->map, cross_point, direction);
 
         // draw a line at position sx
-        int line_length = caliculate_line_length(view_ray, cross_point);
+        int line_length = calculate_line_length(view_ray, cross_point);
         if (line_length > 0)
             my_mlx_draw_line(&vars->img2, sx, MINIWINDOW_H / 2 - line_length / 2, sx, MINIWINDOW_H / 2 + line_length / 2, color);
         sx++;

@@ -7,6 +7,8 @@
 #define PLAYER_RADIUS 10
 #define PLAYER_COLOR 0x00ff0000
 #define TEXT_COLOR 0x00ffffff
+#define DEFAULT_VIEW_LENGTH 300
+#define VIEW_ANGLE (PI / 4.0)
 
 int init_player(t_player *player, int x, int y)
 {
@@ -14,7 +16,7 @@ int init_player(t_player *player, int x, int y)
         return -1;
     player->x = x;
     player->y = y;
-    player->angle = 344;
+    player->angle = 232;
 
     return 0;
 }
@@ -70,7 +72,6 @@ int update_player(t_vars *vars)
     return 0;
 }
 
-#define VIEW_LENGTH 300
 void draw_player_view_line(t_vars *vars)
 {
     t_player *player = &vars->player;
@@ -79,10 +80,10 @@ void draw_player_view_line(t_vars *vars)
     t_line screen_line;
 
     double radian = (player->angle * PI) / 180.0;
-    screen_line.x0 = player->x + VIEW_LENGTH * cos(radian - PI / 4.0);
-    screen_line.y0 = player->y + VIEW_LENGTH * sin(radian - PI / 4.0);
-    screen_line.x1 = player->x + VIEW_LENGTH * cos(radian + PI / 4.0);
-    screen_line.y1 = player->y + VIEW_LENGTH * sin(radian + PI / 4.0);
+    screen_line.x0 = player->x + DEFAULT_VIEW_LENGTH * cos(radian - VIEW_ANGLE);
+    screen_line.y0 = player->y + DEFAULT_VIEW_LENGTH * sin(radian - VIEW_ANGLE);
+    screen_line.x1 = player->x + DEFAULT_VIEW_LENGTH * cos(radian + VIEW_ANGLE);
+    screen_line.y1 = player->y + DEFAULT_VIEW_LENGTH * sin(radian + VIEW_ANGLE);
     draw_line(&vars->img, &vars->camera, &screen_line, 0x00ffffff);
 
     draw_player_view(vars, &screen_line);

@@ -117,7 +117,8 @@ int main(void)
 
     vars->map = init_map(10, 10);
     init_camera(&vars->camera, 0, 0, 10 * 100, 10 * 100);
-    init_player(&vars->player, 5 * 100 + 50, 5 * 100 + 50);
+    // init_player(&vars->player, 5 * 100 + 50, 5 * 100 + 50);
+    init_player(&vars->player, 287, 461);
     init_wall(wall, sizeof(wall) / sizeof(t_wall));
     init_mouse(&vars->mouse);
 

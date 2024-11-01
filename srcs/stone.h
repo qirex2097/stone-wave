@@ -162,7 +162,6 @@ int init_player(t_player *player, int x, int y);
 int init_mouse(t_mouse *mouse);
 int update_player(t_vars *vars);
 int draw_player(t_vars *vars);
-double cosine_angle(int x1, int y1, int x2, int y2, int x3, int y3);
 
 /* wall.c */
 int init_wall(t_wall *param, int kazu);
