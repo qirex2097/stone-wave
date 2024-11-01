@@ -7,8 +7,7 @@
 #define PLAYER_RADIUS 10
 #define PLAYER_COLOR 0x00ff0000
 #define TEXT_COLOR 0x00ffffff
-#define DEFAULT_VIEW_LENGTH 300
-#define DEFAULT_VIEW_ANGLE 45
+#define DEFAULT_SCREEN_DISTANCE 100
 
 int init_player(t_player *player, int x, int y)
 {
@@ -72,16 +71,17 @@ int update_player(t_vars *vars)
     return 0;
 }
 
-t_line calculate_screen_line(t_vars *vars)
+t_line calculate_screen_line(t_vars *vars, int distance)
 {
     t_player *player = &vars->player;
     t_line screen_line;
 
-    int angle = DEFAULT_VIEW_ANGLE;
-    screen_line.x0 = player->x + DEFAULT_VIEW_LENGTH * cos((player->angle - angle) * PI / 180.0);
-    screen_line.y0 = player->y + DEFAULT_VIEW_LENGTH * sin((player->angle - angle) * PI / 180.0);
-    screen_line.x1 = player->x + DEFAULT_VIEW_LENGTH * cos((player->angle + angle) * PI / 180.0);
-    screen_line.y1 = player->y + DEFAULT_VIEW_LENGTH * sin((player->angle + angle) * PI / 180.0);
+    double player_angle = player->angle * PI / 180;
+    int screen_size = 100;
+    screen_line.x0 = player->x + distance * cos(player_angle) + screen_size * cos(player_angle + PI / 2.0);
+    screen_line.y0 = player->y + distance * sin(player_angle) + screen_size * sin(player_angle + PI / 2.0);
+    screen_line.x1 = player->x + distance * cos(player_angle) + screen_size * cos(player_angle - PI / 2.0);
+    screen_line.y1 = player->y + distance * sin(player_angle) + screen_size * sin(player_angle - PI / 2.0);
 
     return screen_line;
 }
@@ -113,7 +113,7 @@ int draw_player(t_vars *vars)
 {
     t_line screen_line;
     draw_player_lines(vars);
-    screen_line = calculate_screen_line(vars);
+    screen_line = calculate_screen_line(vars, DEFAULT_SCREEN_DISTANCE);
     draw_line(&vars->img, &vars->camera, &screen_line, 0x00ffffff); // screen_line
     draw_player_view(vars, &screen_line);                           // mini_window.c
     render_player_info(vars);
