@@ -86,7 +86,7 @@ int initialize_mlx(t_vars *vars)
         perror("Unable to initialize mini window");
         return -1;
     }
-    init_buff();
+    vars->buff = init_buff();
     return 0;
 }
 

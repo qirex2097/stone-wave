@@ -7,6 +7,8 @@
 #define WINDOW_W 800
 #define WINDOW_H 800
 
+#define ROW_MAX 50
+
 #define TURN_LEFT (1L << 0)
 #define TURN_RIGHT (1L << 1)
 #define MOVE_UP (1L << 2)
@@ -72,6 +74,12 @@ typedef struct
 
 typedef struct
 {
+    int row_kazu;
+    char *rows[ROW_MAX + 1];
+} t_buff;
+
+typedef struct
+{
     void *img;
     char *addr;
     int bits_per_pixel;
@@ -123,6 +131,7 @@ typedef struct
     t_mouse mouse;
     int mini_x, mini_y;
     t_map *map;
+    t_buff *buff;
 } t_vars;
 
 /* main.c */
@@ -186,7 +195,7 @@ t_pos detect_ray_wall_intersection(t_map *map, t_pos origin, t_vec direction);
 int get_wall_color(t_map *map, t_pos cross_point, t_vec direction);
 
 /* buff.c */
-void init_buff();
+t_buff *init_buff();
 void cleanup_buff();
 void draw_buff(t_vars *vars);
 void my_string_put(const char *str);

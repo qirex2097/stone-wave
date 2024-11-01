@@ -177,3 +177,22 @@ void draw_rect(t_img *img, t_camera *camera, t_rect *rect, int color)
     line.y0 = rect->y;
     draw_line(img, camera, &line, color);
 }
+
+void draw_buff(t_vars *vars)
+{
+    if (vars == NULL || vars->buff == NULL)
+        return;
+    t_buff *buff = vars->buff;
+    int offset_x = 10;
+    int offset_y = 10;
+    int color = 0x00ffffff;
+    char *str;
+
+    int i = 0;
+    while (i < buff->row_kazu)
+    {
+        str = buff->rows[i];
+        mlx_string_put(vars->mlx, vars->mlx_win, offset_x, offset_y + i * 10, color, str);
+        i++;
+    }
+}
