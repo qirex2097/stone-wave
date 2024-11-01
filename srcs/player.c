@@ -78,10 +78,10 @@ t_line calculate_screen_line(t_vars *vars, int distance)
 
     double player_angle = player->angle * PI / 180;
     int screen_size = 100;
-    screen_line.x0 = player->x + distance * cos(player_angle) + screen_size * cos(player_angle + PI / 2.0);
-    screen_line.y0 = player->y + distance * sin(player_angle) + screen_size * sin(player_angle + PI / 2.0);
-    screen_line.x1 = player->x + distance * cos(player_angle) + screen_size * cos(player_angle - PI / 2.0);
-    screen_line.y1 = player->y + distance * sin(player_angle) + screen_size * sin(player_angle - PI / 2.0);
+    screen_line.x0 = player->x + distance * cos(player_angle) + screen_size * cos(player_angle - PI / 2.0);
+    screen_line.y0 = player->y + distance * sin(player_angle) + screen_size * sin(player_angle - PI / 2.0);
+    screen_line.x1 = player->x + distance * cos(player_angle) + screen_size * cos(player_angle + PI / 2.0);
+    screen_line.y1 = player->y + distance * sin(player_angle) + screen_size * sin(player_angle + PI / 2.0);
 
     return screen_line;
 }
@@ -115,7 +115,7 @@ int draw_player(t_vars *vars)
     draw_player_lines(vars);
     screen_line = calculate_screen_line(vars, DEFAULT_SCREEN_DISTANCE);
     draw_line(&vars->img, &vars->camera, &screen_line, 0x00ffffff); // screen_line
-    draw_player_view(vars, &screen_line);                           // mini_window.c
+    draw_player_view(vars, screen_line);                            // mini_window.c
     render_player_info(vars);
     return 0;
 }

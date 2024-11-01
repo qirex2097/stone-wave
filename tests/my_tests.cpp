@@ -9,8 +9,7 @@ extern "C"
     extern int do_intersect(t_line *line1, t_line *line2);
 
     int mlx_string_put(void *xvar, void *win, int x, int y, int color, char *string) { return 0; }
-    void draw_miniwindow(t_vars *vars, t_wall *wall, t_line *way, int sx) {}
-    void draw_player_view(t_vars *vars, t_line *screen) {}
+    void draw_player_view(t_vars *vars, t_line screen) {}
 
     /* map.c */
     int is_not_space(t_map *map, int map_x, int map_y);

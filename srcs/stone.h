@@ -132,6 +132,7 @@ typedef struct
     int mini_x, mini_y;
     t_map *map;
     t_buff *buff;
+    uint64_t counter;
 } t_vars;
 
 /* main.c */
@@ -154,7 +155,6 @@ void draw_rect(t_img *data, t_camera *camera, t_rect *rect, int color);
 int get_intersection(t_line *line0, t_line *line1, t_pos *cross_point);
 void convert_to_screen(t_pos *field, t_pos_s *screen, t_img *img, t_camera *camera);
 void convert_to_field(t_pos_s *screen, t_pos *field, t_img *img, t_camera *camera);
-t_pos map_point_on_line(t_line *line, int w, int a);
 void scale_segment(t_line *line, int a, t_line *line_new);
 
 /* player.c */
@@ -183,7 +183,7 @@ int update_camera(t_vars *vars);
 int init_mini_window(t_vars *vars);
 int render_mini_window(t_vars *vars);
 void draw_miniwindow(t_vars *vars, t_wall *wall, t_line *way, int sx);
-void draw_player_view(t_vars *vars, t_line *screen);
+void draw_player_view(t_vars *vars, t_line screen_line);
 
 /* map.c */
 t_map *init_map(int w, int h);

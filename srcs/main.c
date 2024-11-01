@@ -7,8 +7,12 @@
 
 int render_next_frame(void *param)
 {
+    if (param == NULL)
+        return 0;
     t_vars *vars = (t_vars *)param;
     t_img *img = (t_img *)&vars->img;
+
+    vars->counter++;
 
     mlx_put_image_to_window(vars->mlx, vars->mlx_win, img->img, 0, 0);
 
