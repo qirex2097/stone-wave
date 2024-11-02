@@ -1,6 +1,11 @@
-drawing.o: drawing.c stone.h
-key_handler.o: key_handler.c stone.h
-main.o: main.c stone.h
-mini_window.o: mini_window.c stone.h
-player.o: player.c stone.h
-wall.o: wall.c stone.h
+buff.o: srcs/buff.c srcs/stone.h
+camera.o: srcs/camera.c srcs/stone.h
+drawing.o: srcs/drawing.c srcs/stone.h
+drawing_utils.o: srcs/drawing_utils.c srcs/stone.h
+key_handler.o: srcs/key_handler.c srcs/stone.h
+main.o: srcs/main.c srcs/stone.h
+map.o: srcs/map.c srcs/stone.h
+mini_window.o: srcs/mini_window.c srcs/stone.h
+player.o: srcs/player.c srcs/stone.h
+utils.o: srcs/utils.c
+wall.o: srcs/wall.c srcs/stone.h

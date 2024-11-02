@@ -4,7 +4,9 @@
             "type": "shell",
             "label": "Make",
             "command": "make",
-            "args": [],
+            "args": [
+                "stone"
+            ],
             "options": {
                 "cwd": "${workspaceFolder}"
             },

@@ -2,13 +2,6 @@
 #include <stdlib.h>
 #include "stone.h"
 
-typedef enum
-{
-    COLLINEAR = 0,
-    CLOCKWISE,
-    COUNTERCLOCKWISE,
-} Orientation;
-
 int is_out_of_bounds(int x, int y, int w, int h)
 {
     return (x < 0 || w <= x || y < 0 || h <= y);
@@ -107,84 +100,7 @@ void draw_circle_s(t_img *img, t_pos *center, int radius, int color)
 
 void draw_line_s(t_img *data, t_line *line, int color)
 {
-    my_mlx_draw_line(data, line->p0.x, line->p0.y, line->p1.x, line->p1.y, color);
-}
-
-int orientation(t_pos *p1, t_pos *p2, t_pos *p3)
-{
-    long long val = (p2->y - p1->y) * (p3->x - p2->x) - (p2->x - p1->x) * (p3->y - p2->y);
-    if (val == 0)
-        return COLLINEAR;
-    return (val > 0) ? CLOCKWISE : COUNTERCLOCKWISE;
-}
-
-int on_segment(t_pos *p1, t_pos *p2, t_pos *p3)
-{
-    return (p3->x <= ((p1->x > p2->x) ? p1->x : p2->x) &&
-            p3->x >= ((p1->x < p2->x) ? p1->x : p2->x) &&
-            p3->y <= ((p1->y > p2->y) ? p1->y : p2->y) &&
-            p3->y >= ((p1->y < p2->y) ? p1->y : p2->y));
-}
-
-int do_intersect(t_line *line1, t_line *line2)
-{
-    int o1 = orientation(&line1->p0, &line1->p1, &line2->p0);
-    int o2 = orientation(&line1->p0, &line1->p1, &line2->p1);
-    int o3 = orientation(&line2->p0, &line2->p1, &line1->p0);
-    int o4 = orientation(&line2->p0, &line2->p1, &line1->p1);
-
-    if (o1 != o2 && o3 != o4)
-        return 1;
-
-    if (o1 == 0 && on_segment(&line1->p0, &line1->p1, &line2->p0))
-        return 1;
-    if (o2 == 0 && on_segment(&line1->p0, &line1->p1, &line2->p1))
-        return 1;
-    if (o3 == 0 && on_segment(&line2->p0, &line2->p1, &line1->p0))
-        return 1;
-    if (o4 == 0 && on_segment(&line2->p0, &line2->p1, &line1->p1))
-        return 1;
-
-    return 0;
-}
-
-int get_intersection(t_line *line0, t_line *line1, t_pos *cross_point)
-{
-    int x1 = line0->p0.x, y1 = line0->p0.y;
-    int x2 = line0->p1.x, y2 = line0->p1.y;
-    int x3 = line1->p0.x, y3 = line1->p0.y;
-    int x4 = line1->p1.x, y4 = line1->p1.y;
-
-    long long denom = (long long)(x1 - x2) * (y3 - y4) - (long long)(y1 - y2) * (x3 - x4);
-
-    if (denom == 0)
-    {
-        return 0;
-    }
-
-    long long num_x = (long long)(x1 * y2 - y1 * x2) * (x3 - x4) - (long long)(x1 - x2) * (x3 * y4 - y3 * x4);
-    long long num_y = (long long)(x1 * y2 - y1 * x2) * (y3 - y4) - (long long)(y1 - y2) * (x3 * y4 - y3 * x4);
-
-    cross_point->x = num_x / denom;
-    cross_point->y = num_y / denom;
-
-    return 1;
-}
-
-void convert_to_screen(t_pos *field, t_pos_s *screen, t_img *img, t_camera *camera)
-{
-    if (img == NULL || camera == NULL || camera->w == 0 || camera->h == 0)
-        return;
-    screen->x = (field->x - camera->x) * img->w / camera->w;
-    screen->y = (field->y - camera->y) * img->h / camera->h;
-}
-
-void convert_to_field(t_pos_s *screen, t_pos *field, t_img *img, t_camera *camera)
-{
-    if (camera == NULL || img == NULL || img->w == 0 || img->h == 0)
-        return;
-    field->x = screen->x * camera->w / img->w + camera->x;
-    field->y = screen->y * camera->h / img->h + camera->y;
+    my_mlx_draw_line(data, line->x0, line->y0, line->x1, line->y1, color);
 }
 
 void put_pixel(t_img *img, t_camera *field, int x, int y, int color)
@@ -199,10 +115,15 @@ void put_pixel(t_img *img, t_camera *field, int x, int y, int color)
 
 void draw_line(t_img *img, t_camera *field, t_line *line, int color)
 {
-    t_pos_s p0, p1;
-    convert_to_screen(&line->p0, &p0, img, field);
-    convert_to_screen(&line->p1, &p1, img, field);
-    my_mlx_draw_line(img, p0.x, p0.y, p1.x, p1.y, color);
+    t_pos p1, p2;
+    t_pos_s ps0, ps1;
+    p1.x = line->x0;
+    p1.y = line->y0;
+    p2.x = line->x1;
+    p2.y = line->y1;
+    convert_to_screen(&p1, &ps0, img, field);
+    convert_to_screen(&p2, &ps1, img, field);
+    my_mlx_draw_line(img, ps0.x, ps0.y, ps1.x, ps1.y, color);
 }
 
 void draw_circle(t_img *img, t_camera *camera, t_pos *center, int radius, int color)
@@ -238,10 +159,41 @@ void draw_circle(t_img *img, t_camera *camera, t_pos *center, int radius, int co
     }
 }
 
-// 2点間の距離の平方を計算する関数
-long long distance_squared(int x1, int y1, int x2, int y2)
+void draw_rect(t_img *img, t_camera *camera, t_rect *rect, int color)
 {
-    long long dx = x2 - x1;
-    long long dy = y2 - y1;
-    return dx * dx + dy * dy;
+    t_line line;
+    line.x0 = rect->x;
+    line.y0 = rect->y;
+    line.x1 = rect->x + rect->w;
+    line.y1 = rect->y;
+    draw_line(img, camera, &line, color);
+    line.x0 = rect->x + rect->w;
+    line.y0 = rect->y + rect->h;
+    draw_line(img, camera, &line, color);
+    line.x1 = rect->x;
+    line.y1 = rect->y + rect->h;
+    draw_line(img, camera, &line, color);
+    line.x0 = rect->x;
+    line.y0 = rect->y;
+    draw_line(img, camera, &line, color);
+}
+
+void draw_buff(t_vars *vars)
+{
+    if (vars == NULL || vars->buff == NULL)
+        return;
+    t_buff *buff = vars->buff;
+    int offset_x = 10;
+    int offset_y = 10;
+    int color = 0x00ffffff;
+    char *str;
+
+    int i = 0;
+    while (i < buff->row_kazu)
+    {
+        str = buff->rows[i];
+        if (str)
+            mlx_string_put(vars->mlx, vars->mlx_win, offset_x, offset_y + i * 10, color, str);
+        i++;
+    }
 }

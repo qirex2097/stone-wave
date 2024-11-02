@@ -7,6 +7,8 @@
 #define WINDOW_W 800
 #define WINDOW_H 800
 
+#define ROW_MAX 50
+
 #define TURN_LEFT (1L << 0)
 #define TURN_RIGHT (1L << 1)
 #define MOVE_UP (1L << 2)
@@ -42,6 +44,13 @@
 #define KEY_K 107
 #define KEY_L 108
 
+typedef enum
+{
+    COLLINEAR = 0,
+    CLOCKWISE,
+    COUNTERCLOCKWISE,
+} Orientation;
+
 typedef struct
 {
     int x, y;
@@ -50,12 +59,24 @@ typedef struct
 typedef struct
 {
     int x, y;
-} t_pos;
+} t_pos, t_vec;
 
 typedef struct
 {
-    t_pos p0, p1;
-} t_line;
+    int x0, y0, x1, y1;
+} t_line, t_pair;
+
+typedef struct
+{
+    int x, y;
+    int w, h;
+} t_rect;
+
+typedef struct
+{
+    int row_kazu;
+    char *rows[ROW_MAX + 1];
+} t_buff;
 
 typedef struct
 {
@@ -93,6 +114,14 @@ typedef struct
 
 typedef struct
 {
+    char **data;
+    int x, y;
+    int w, h;
+    int grid_size;
+} t_map;
+
+typedef struct
+{
     void *mlx;
     void *mlx_win;
     t_camera camera;
@@ -101,36 +130,45 @@ typedef struct
     t_player player;
     t_mouse mouse;
     int mini_x, mini_y;
+    t_map *map;
+    t_buff *buff;
+    uint64_t counter;
 } t_vars;
 
 /* main.c */
 void cleanup(t_vars *vars);
+
+/* utils.c */
+long long distance_squared(int x1, int y1, int x2, int y2);
+double cosine_angle(int x1, int y1, int x2, int y2, int x3, int y3);
 
 /* drawing.c */
 void my_mlx_pixel_put(t_img *data, int x, int y, int color);
 void my_mlx_draw_line(t_img *data, int x0, int y0, int x1, int y1, int color);
 void draw_line_s(t_img *data, t_line *line, int color);
 void draw_circle_s(t_img *img, t_pos *center, int radius, int color);
-int do_intersect(t_line *line1, t_line *line2);
+void draw_line(t_img *data, t_camera *camera, t_line *line, int color);
+void draw_circle(t_img *img, t_camera *camera, t_pos *center, int radius, int color);
+void draw_rect(t_img *data, t_camera *camera, t_rect *rect, int color);
+
+/* drawing_utils.c */
 int get_intersection(t_line *line0, t_line *line1, t_pos *cross_point);
 void convert_to_screen(t_pos *field, t_pos_s *screen, t_img *img, t_camera *camera);
 void convert_to_field(t_pos_s *screen, t_pos *field, t_img *img, t_camera *camera);
-void draw_line(t_img *data, t_camera *camera, t_line *line, int color);
-void draw_circle(t_img *img, t_camera *camera, t_pos *center, int radius, int color);
-long long distance_squared(int x1, int y1, int x2, int y2);
+void scale_segment(t_line *line, int a, t_line *line_new);
 
 /* player.c */
-int init_player(t_player *player);
+int init_player(t_player *player, int x, int y);
 int init_mouse(t_mouse *mouse);
 int update_player(t_vars *vars);
 int draw_player(t_vars *vars);
-double cosine_angle(int x1, int y1, int x2, int y2, int x3, int y3);
 
 /* wall.c */
 int init_wall(t_wall *param, int kazu);
 int update_wall(t_vars *vars);
 int draw_wall(t_vars *vars);
 t_wall *get_wall(int idx);
+int find_intersection_point(t_vars *vars, t_line *line, t_pos *cross_point, t_wall *wall_);
 
 /* key_hendler.c */
 int key_press_handler(int keycode, void *param);
@@ -144,5 +182,21 @@ int update_camera(t_vars *vars);
 /* mini_window.c */
 int init_mini_window(t_vars *vars);
 int render_mini_window(t_vars *vars);
+void draw_miniwindow(t_vars *vars, t_wall *wall, t_line *way, int sx);
+void draw_player_view(t_vars *vars, t_line screen_line);
+
+/* map.c */
+t_map *init_map(int w, int h);
+void free_map(t_map *map);
+int draw_map(t_vars *);
+t_pos find_next_grid_crossing(t_pos ray_origin, t_vec ray_direction, int grid_size);
+t_pos detect_ray_wall_intersection(t_map *map, t_pos origin, t_vec direction);
+int get_wall_color(t_map *map, t_pos cross_point, t_vec direction);
+
+/* buff.c */
+t_buff *init_buff();
+void cleanup_buff();
+void draw_buff(t_vars *vars);
+void my_string_put(const char *str);
 
 #endif //_STONE_H_

@@ -10,25 +10,33 @@ LDFLAGS = -L$(MLX_DIR) -lm -lmlx -lX11 -lXext
 TARGET = stone
 
 # ソースファイル
-SRCS = $(wildcard *.c)
+SRC_DIR = srcs
+SRCS = $(wildcard $(SRC_DIR)/*.c)
 
 # オブジェクトファイルの指定（.c -> .o に変換）
-OBJS = $(SRCS:.c=.o)
+OBJ_DIR = objs
+OBJS = $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRCS))
 
 # ルール定義
-all: $(TARGET)
+all: $(TARGET) tests
 
 # 実行ファイルのビルドルール
 $(TARGET): $(OBJS)
 	$(CC) -o $(TARGET) $(OBJS) $(LDFLAGS)
 
 # 各ソースファイルのオブジェクトファイルを作成するルール
-%.o: %.c
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJ_DIR):
+	mkdir -p $(OBJ_DIR)
 
 # クリーンアップルール
 clean:
-	rm -f $(OBJS) $(TARGET) $(TEST_OBJ) $(TEST_TARGET)
+	rm -f $(OBJS) $(TARGET) $(TEST_OBJS) $(TEST_TARGET)
+
+fclean: clean
+	rm -f $(GOOGLE_TEST_OBJS)
 
 # ディペンデンシの自動生成（オプション）
 depend: $(SRCS)
@@ -39,21 +47,22 @@ depend: $(SRCS)
 
 # テスト用
 CXX = g++
-CXXFLAGS = -I./googletest -I./googletest/include -pthread
-GOOGLE_TEST_OBJS = googletest/src/gtest-all.o googletest/src/gtest_main.o
-TEST_SRC = tests/my_tests.cpp
-TEST_TARGET_SRCS = drawing.c player.c wall.c
+CXXFLAGS = -I$(GOOGLE_TEST_DIR) -I$(GOOGLE_TEST_DIR)/include -pthread
+GOOGLE_TEST_DIR = googletest
+GOOGLE_TEST_OBJS = $(GOOGLE_TEST_DIR)/src/gtest-all.o $(GOOGLE_TEST_DIR)/src/gtest_main.o
+TEST_DIR = tests
+TEST_SRCS = $(wildcard $(TEST_DIR)/*.cpp)
+TEST_TARGET_SRCS = $(filter-out $(SRC_DIR)/main.c $(SRC_DIR)/mini_window.c $(SRC_DIR)/key_handler.c, $(wildcard $(SRC_DIR)/*.c))
 TEST_TARGET = run_tests
-TEST_OBJ = $(TEST_TARGET_SRCS:.c=.o) $(TEST_SRC:.cpp=.o)
+TEST_OBJS = $(patsubst srcs/%.c, $(OBJ_DIR)/%.o, $(TEST_TARGET_SRCS)) $(patsubst $(TEST_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(TEST_SRCS))
 
-%.o: %.cpp
+$(OBJ_DIR)/%.o: $(TEST_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
-
 
 tests: $(TEST_TARGET)
 	./$(TEST_TARGET)
 
-$(TEST_TARGET): $(TEST_OBJ) $(OBJS) $(GOOGLE_TEST_OBJS)
-	$(CXX) $(TEST_OBJ) $(GOOGLE_TEST_OBJS) -o $(TEST_TARGET)
+$(TEST_TARGET): $(TEST_OBJS) $(OBJS) $(GOOGLE_TEST_OBJS)
+	$(CXX) $(TEST_OBJS) $(GOOGLE_TEST_OBJS) -o $(TEST_TARGET)
 
 .PHONY: tests
